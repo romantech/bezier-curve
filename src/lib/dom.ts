@@ -1,5 +1,5 @@
 import type { DefinedElements } from './types';
-import { BezierPoints } from './bezier-points';
+import { BezierDegreeKeys } from './bezier-points';
 
 const UnsafeElements = {
   $staticCanvas: document.querySelector<HTMLCanvasElement>('.static-canvas'),
@@ -27,8 +27,7 @@ export class UIController {
     this.elements.$degreeLabel.textContent = label;
   }
 
-  public populateDegreePicker(points = BezierPoints) {
-    const degreeKeys = Object.keys(points);
+  public populateDegreePicker(degreeKeys = BezierDegreeKeys) {
     const initialKeyIdx = 0;
 
     degreeKeys.forEach((key, i) => {

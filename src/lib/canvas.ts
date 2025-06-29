@@ -40,4 +40,6 @@ export const setupCanvasResolution = (
     //    ctx.scale()을 생략하면 도형이 절반 크기로 작게 보임
     ctx.scale(dpr, dpr);
   });
+
+  return { cssWidth, cssHeight };
 };

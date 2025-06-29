@@ -1,5 +1,6 @@
 import {
-  BezierPoints,
+  BezierPointRatios,
+  createPointMapper,
   type Degree,
   setupCanvasCtx,
   setupCanvasResolution,
@@ -12,12 +13,19 @@ function setupApp() {
   try {
     const { staticCtx, dynamicCtx } = setupCanvasCtx($staticCanvas, $dynamicCanvas);
 
-    setupCanvasResolution($staticCanvas, $dynamicCanvas, staticCtx, dynamicCtx);
+    const { cssWidth, cssHeight } = setupCanvasResolution(
+      $staticCanvas,
+      $dynamicCanvas,
+      staticCtx,
+      dynamicCtx,
+    );
+
+    const mapPoints = createPointMapper(cssWidth, cssHeight);
 
     const bezierCurve = new BezierCurve({
       staticCtx,
       dynamicCtx,
-      points: BezierPoints.quadratic,
+      points: mapPoints(BezierPointRatios.quadratic),
       onTick: uiController.updateTLabel.bind(uiController),
     });
 
@@ -29,8 +37,10 @@ function setupApp() {
       if (!(event.target instanceof HTMLSelectElement)) return;
 
       const selectedDegree = event.target.value as Degree;
+      const points = mapPoints(BezierPointRatios[selectedDegree]);
+
       uiController.updateDegreeLabel(selectedDegree);
-      bezierCurve.setPoints(BezierPoints[selectedDegree]).reset();
+      bezierCurve.stop().setPoints(points).reset();
     });
   } catch (e) {
     console.error('앱 초기화 실패:', e);
