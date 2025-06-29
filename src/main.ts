@@ -19,7 +19,7 @@ function setupApp() {
     bezierCurve.drawStaticLayer();
     bezierCurve.drawDynamicLayer(0);
 
-    startBtn.addEventListener('click', () => bezierCurve.start());
+    startBtn.addEventListener('click', bezierCurve.start.bind(bezierCurve));
   } catch (e) {
     console.error('앱 초기화 실패:', e);
     document.body.innerHTML = '<div class="error">앱을 초기화할 수 없습니다.</div>';
