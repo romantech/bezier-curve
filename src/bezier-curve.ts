@@ -18,11 +18,11 @@ export class BezierCurve {
 
     this.points = options.points.slice();
     this.duration = options.duration ?? 4000;
-    this.pointColors = options.colors ?? ['#72CC7C', '#58BDED', '#F9A825', '#E91E63'];
+    this.pointColors = options.pointColors ?? ['#72CC7C', '#58BDED', '#F9A825', '#E91E63'];
     this.finalPointColor = options.finalPointColor ?? '#F9DE60';
 
-    this.width = this.staticCtx.canvas.clientWidth;
-    this.height = this.staticCtx.canvas.clientHeight;
+    this.width = this.staticCtx.canvas.width;
+    this.height = this.staticCtx.canvas.height;
 
     this.tLabelElem = options.tLabelElem ?? null;
   }
@@ -96,9 +96,10 @@ export class BezierCurve {
     }
   }
 
-  public stop(): void {
+  public stop() {
     if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
     this.animationFrameId = null;
+    return this;
   }
 
   public start(): void {
@@ -113,16 +114,20 @@ export class BezierCurve {
       this.drawDynamicLayer(t);
 
       if (t < 1) this.animationFrameId = requestAnimationFrame(animate);
+      else this.animationFrameId = null;
     };
     this.animationFrameId = requestAnimationFrame(animate);
   }
 
-  public setPoints(newPoints: Point[]): void {
-    this.points = newPoints;
-
+  public reset() {
     this.drawStaticLayer();
     this.drawDynamicLayer(0);
     this._setLabel(0);
+  }
+
+  public setPoints(newPoints: Point[]) {
+    this.points = newPoints.slice();
+    return this;
   }
 
   private _setLabel(t: number) {

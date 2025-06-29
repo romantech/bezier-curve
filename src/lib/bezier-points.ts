@@ -1,6 +1,6 @@
 import type { Degree, Point } from './types';
 
-export const Points = {
+export const BezierPoints = {
   /** 2차 베지에 곡선 */
   quadratic: [
     { x: 50, y: 350 },

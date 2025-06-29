@@ -1,44 +1,38 @@
 import './style.css';
-import { BezierCurve } from './bezier-curve';
 import {
+  BezierPoints,
   type Degree,
-  Points,
-  setupCanvasContexts,
+  getValidElements,
+  populateDegreePicker,
+  setupCanvasCtx,
   setupCanvasResolution,
-  validateDOMElements,
 } from './lib';
+import { BezierCurve } from './bezier-curve';
 
 function setupApp() {
   try {
-    const { $staticCanvas, $dynamicCanvas, $startBtn, $degreePicker, $tLabel, $title } =
-      validateDOMElements();
-    const { staticCtx, dynamicCtx } = setupCanvasContexts($staticCanvas, $dynamicCanvas);
+    const { $staticCv, $dynamicCv, $startBtn, $degreePicker, $tLabel, $title } = getValidElements();
+    const { staticCtx, dynamicCtx } = setupCanvasCtx($staticCv, $dynamicCv);
 
-    Object.keys(Points).forEach((key, i) => {
-      const option = new Option(key, undefined, i === 0);
-      $degreePicker.appendChild(option);
-    });
-
-    setupCanvasResolution($staticCanvas, $dynamicCanvas, staticCtx, dynamicCtx);
+    populateDegreePicker($degreePicker);
+    setupCanvasResolution($staticCv, $dynamicCv, staticCtx, dynamicCtx);
 
     const bezierCurve = new BezierCurve({
       staticCtx,
       dynamicCtx,
-      points: Points.cubic,
+      points: BezierPoints.quadratic,
       tLabelElem: $tLabel,
     });
 
-    bezierCurve.drawStaticLayer();
-    bezierCurve.drawDynamicLayer(0);
+    bezierCurve.reset();
 
     $startBtn.addEventListener('click', bezierCurve.start.bind(bezierCurve));
     $degreePicker?.addEventListener('change', (event) => {
-      if (event.target instanceof HTMLSelectElement) {
-        const selectedValue = event.target.value as Degree;
-        $title.textContent = `${selectedValue} Bezier Curve`;
-        bezierCurve.stop();
-        bezierCurve.setPoints(Points[selectedValue]);
-      }
+      if (!(event.target instanceof HTMLSelectElement)) return;
+
+      const degree = event.target.value as Degree;
+      $title.textContent = `${degree} Bezier Curve`;
+      bezierCurve.setPoints(BezierPoints[degree]).reset();
     });
   } catch (e) {
     console.error('앱 초기화 실패:', e);

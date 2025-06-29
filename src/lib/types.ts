@@ -10,7 +10,7 @@ export interface BezierCurveOptions {
   dynamicCtx: CanvasRenderingContext2D;
   points: Point[];
   duration?: number;
-  colors?: string[];
+  pointColors?: string[];
   finalPointColor?: string;
   tLabelElem?: HTMLElement | null;
 }
