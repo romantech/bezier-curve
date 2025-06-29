@@ -7,23 +7,24 @@ export class BezierCurve {
   private readonly width: number;
   private readonly height: number;
   private readonly duration: number;
-  private readonly colors: string[];
+  private readonly pointColors: string[];
   private readonly finalPointColor: string;
-  private readonly labelElem: HTMLLabelElement | null;
+  private readonly tLabelElem: HTMLElement | null;
   private animationFrameId: number | null = null;
 
   constructor(options: BezierCurveOptions) {
     this.staticCtx = options.staticCtx;
     this.dynamicCtx = options.dynamicCtx;
-    this.points = options.points;
+
+    this.points = options.points.slice();
     this.duration = options.duration ?? 4000;
-    this.colors = options.colors ?? ['#72CC7C', '#58BDED', '#F9A825', '#E91E63'];
+    this.pointColors = options.pointColors ?? ['#72CC7C', '#58BDED', '#F9A825', '#E91E63'];
     this.finalPointColor = options.finalPointColor ?? '#F9DE60';
 
-    this.width = this.staticCtx.canvas.clientWidth;
-    this.height = this.staticCtx.canvas.clientHeight;
+    this.width = this.staticCtx.canvas.width;
+    this.height = this.staticCtx.canvas.height;
 
-    this.labelElem = options.labelElem ?? null;
+    this.tLabelElem = options.tLabelElem ?? null;
   }
 
   public drawStaticLayer(): void {
@@ -72,7 +73,7 @@ export class BezierCurve {
     let level = 0;
 
     while (currentPoints.length > 1) {
-      const color = this.colors[level % this.colors.length];
+      const color = this.pointColors[level % this.pointColors.length];
       const nextPoints: Point[] = [];
       for (let i = 0; i < currentPoints.length - 1; i++) {
         const p1 = currentPoints[i];
@@ -95,19 +96,43 @@ export class BezierCurve {
     }
   }
 
-  public start(): void {
+  public stop() {
     if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
+    this.animationFrameId = null;
+    return this;
+  }
+
+  public start(): void {
+    this.stop();
 
     let startTime: number | null = null;
     const animate = (now: number): void => {
       if (!startTime) startTime = now;
       const t = Math.min((now - startTime) / this.duration, 1);
-      if (this.labelElem) this.labelElem.textContent = `t = ${t.toFixed(2)}`;
 
+      this._setLabel(t);
       this.drawDynamicLayer(t);
+
       if (t < 1) this.animationFrameId = requestAnimationFrame(animate);
+      else this.animationFrameId = null;
     };
     this.animationFrameId = requestAnimationFrame(animate);
+  }
+
+  public reset() {
+    this.drawStaticLayer();
+    this.drawDynamicLayer(0);
+    this._setLabel(0);
+  }
+
+  public setPoints(newPoints: Point[]) {
+    this.points = newPoints.slice();
+    return this;
+  }
+
+  private _setLabel(t: number) {
+    if (!this.tLabelElem) return;
+    this.tLabelElem.textContent = `t = ${t.toFixed(2)}`;
   }
 
   private _lerp(a: number, b: number, t: number): number {

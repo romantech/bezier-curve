@@ -8,14 +8,17 @@
   </head>
   <body>
     <div id="app">
-      <h2>Cubic Bezier Curves</h2>
+      <h2 class="title">cubic bezier curves</h2>
       <var class="t-label">t = 0</var>
 
       <div class="canvas-container">
         <canvas class="static-canvas"></canvas>
         <canvas class="dynamic-canvas"></canvas>
       </div>
-      <button class="start-animation">Start Animation</button>
+      <div class="controls">
+        <button class="start-animation">start animation</button>
+        <select class="degree-picker" name="degree-picker"></select>
+      </div>
     </div>
     <script src="/src/main.ts" type="module"></script>
   </body>
