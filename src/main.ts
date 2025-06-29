@@ -1,48 +1,29 @@
 import './style.css';
 import { BezierCurve } from './bezier-curve';
-import { Points } from './points';
+import { getPoints, setupCanvasContexts, setupCanvasResolution, validateDOMElements } from './lib';
 
 function setupApp() {
-  const staticCanvas = document.querySelector<HTMLCanvasElement>('.static-canvas');
-  const dynamicCanvas = document.querySelector<HTMLCanvasElement>('.dynamic-canvas');
-  const startBtn = document.querySelector<HTMLButtonElement>('.start-animation');
-  const tLabel = document.querySelector<HTMLLabelElement>('.t-label');
+  try {
+    const { staticCanvas, dynamicCanvas, startBtn, tLabel } = validateDOMElements();
+    const { staticCtx, dynamicCtx } = setupCanvasContexts(staticCanvas, dynamicCanvas);
 
-  if (!staticCanvas || !dynamicCanvas || !startBtn) {
-    console.error('필수 HTML 요소(canvas, button)가 문서에 존재하지 않습니다.');
-    return;
+    setupCanvasResolution(staticCanvas, dynamicCanvas, staticCtx, dynamicCtx);
+
+    const bezierCurve = new BezierCurve({
+      staticCtx,
+      dynamicCtx,
+      points: getPoints('quartic'),
+      labelElem: tLabel,
+    });
+
+    bezierCurve.drawStaticLayer();
+    bezierCurve.drawDynamicLayer(0);
+
+    startBtn.addEventListener('click', () => bezierCurve.start());
+  } catch (e) {
+    console.error('앱 초기화 실패:', e);
+    document.body.innerHTML = '<div class="error">앱을 초기화할 수 없습니다.</div>';
   }
-
-  const staticCtx = staticCanvas.getContext('2d');
-  const dynamicCtx = dynamicCanvas.getContext('2d');
-
-  if (!staticCtx || !dynamicCtx) {
-    console.error('Canvas 컨텍스트를 가져올 수 없습니다.');
-    return;
-  }
-
-  const { clientWidth: cvWidth, clientHeight: cvHeight } = staticCanvas;
-  const dpr = window.devicePixelRatio ?? 1;
-  [staticCanvas, dynamicCanvas].forEach((canvas) => {
-    canvas.width = cvWidth * dpr;
-    canvas.height = cvHeight * dpr;
-  });
-  [staticCtx, dynamicCtx].forEach((ctx) => {
-    ctx.scale(dpr, dpr);
-  });
-
-  const bezierCurve = new BezierCurve({
-    staticCtx,
-    dynamicCtx,
-    points: Points.quadratic,
-    duration: 4000,
-    labelElem: tLabel,
-  });
-
-  bezierCurve.drawStaticLayer();
-  bezierCurve.drawDynamicLayer(0);
-
-  startBtn.addEventListener('click', () => bezierCurve.start());
 }
 
 setupApp();

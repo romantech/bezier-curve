@@ -1,8 +1,7 @@
-import type { BezierCurveOptions, Point } from './types';
+import type { BezierCurveOptions, Point } from './lib';
 
 export class BezierCurve {
   public points: Point[];
-
   private readonly staticCtx: CanvasRenderingContext2D;
   private readonly dynamicCtx: CanvasRenderingContext2D;
   private readonly width: number;
@@ -11,7 +10,6 @@ export class BezierCurve {
   private readonly colors: string[];
   private readonly finalPointColor: string;
   private readonly labelElem: HTMLLabelElement | null;
-
   private animationFrameId: number | null = null;
 
   constructor(options: BezierCurveOptions) {
@@ -33,10 +31,12 @@ export class BezierCurve {
     ctx.clearRect(0, 0, this.width, this.height);
 
     // 격자
-    for (let x = 50; x < this.width; x += 50)
+    for (let x = 50; x < this.width; x += 50) {
       this._drawLine(ctx, { x, y: 0 }, { x, y: this.height }, '#333');
-    for (let y = 50; y < this.height; y += 50)
+    }
+    for (let y = 50; y < this.height; y += 50) {
       this._drawLine(ctx, { x: 0, y }, { x: this.width, y }, '#333');
+    }
 
     // 베지어 곡선 전체 경로
     ctx.beginPath();
@@ -172,7 +172,7 @@ export class BezierCurve {
   private _getBezierPoint(points: Point[], t: number): Point {
     if (points.length === 1) return points[0]; // 점 하나 남으면 반환
 
-    // 현재 단계의 보간점들을 계산
+    // 현재 단계의 보간점 계산
     const intermediatePoints = this._getIntermediatePoints(points, t);
     // 보간점들을 가지고 다시 재귀 호출
     return this._getBezierPoint(intermediatePoints, t);

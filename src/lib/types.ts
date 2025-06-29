@@ -1,3 +1,5 @@
+export type CurveType = 'quadratic' | 'cubic' | 'quartic';
+
 export interface Point {
   x: number;
   y: number;
