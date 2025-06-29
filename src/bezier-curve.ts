@@ -2,6 +2,8 @@ import type { BezierCurveOptions, Point } from './lib';
 
 export class BezierCurve {
   public points: Point[];
+  public readonly onTick: BezierCurveOptions['onTick'];
+
   private readonly staticCtx: CanvasRenderingContext2D;
   private readonly dynamicCtx: CanvasRenderingContext2D;
   private readonly width: number;
@@ -9,7 +11,6 @@ export class BezierCurve {
   private readonly duration: number;
   private readonly pointColors: string[];
   private readonly finalPointColor: string;
-  private readonly tLabelElem: HTMLElement | null;
   private animationFrameId: number | null = null;
 
   constructor(options: BezierCurveOptions) {
@@ -23,8 +24,7 @@ export class BezierCurve {
 
     this.width = this.staticCtx.canvas.width;
     this.height = this.staticCtx.canvas.height;
-
-    this.tLabelElem = options.tLabelElem ?? null;
+    this.onTick = options.onTick;
   }
 
   public drawStaticLayer(): void {
@@ -110,7 +110,7 @@ export class BezierCurve {
       if (!startTime) startTime = now;
       const t = Math.min((now - startTime) / this.duration, 1);
 
-      this._setLabel(t);
+      this.onTick(t);
       this.drawDynamicLayer(t);
 
       if (t < 1) this.animationFrameId = requestAnimationFrame(animate);
@@ -122,17 +122,12 @@ export class BezierCurve {
   public reset() {
     this.drawStaticLayer();
     this.drawDynamicLayer(0);
-    this._setLabel(0);
+    this.onTick(0);
   }
 
   public setPoints(newPoints: Point[]) {
     this.points = newPoints.slice();
     return this;
-  }
-
-  private _setLabel(t: number) {
-    if (!this.tLabelElem) return;
-    this.tLabelElem.textContent = `t = ${t.toFixed(2)}`;
   }
 
   private _lerp(a: number, b: number, t: number): number {

@@ -11,9 +11,8 @@
 
 body {
   margin: 0;
-  padding: 16px;
   background-color: #131417;
-  color: #fff;
+  color: white;
   text-align: center;
   display: grid;
   place-content: center;
@@ -47,6 +46,7 @@ body {
   font-size: 16px;
   border-radius: 5px;
   cursor: pointer;
+  color: white;
   transition:
     background-color 0.3s,
     border-color 0.3s;
@@ -84,7 +84,8 @@ body {
   background-size: 0.8em;
 }
 
-var {
+.t-display {
   font-weight: 600;
   color: #f9de60;
+  font-style: italic;
 }
