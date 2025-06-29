@@ -61,7 +61,8 @@ export class BezierCurve {
     // 제어점 및 레이블
     this.points.forEach((p, i) => {
       this._drawPoint(ctx, p, '#fff', 7);
-      this._drawLabel(ctx, p, `P${i}`, 8, -8);
+      const offsetX = i % 2 === 0 ? -26 : 10;
+      this._drawLabel(ctx, p, `P${i}`, offsetX, -8);
     });
   }
 
@@ -75,6 +76,7 @@ export class BezierCurve {
     while (currentPoints.length > 1) {
       const color = this.pointColors[level % this.pointColors.length];
       const nextPoints: Point[] = [];
+
       for (let i = 0; i < currentPoints.length - 1; i++) {
         const p1 = currentPoints[i];
         const p2 = currentPoints[i + 1];
@@ -82,9 +84,11 @@ export class BezierCurve {
         nextPoints.push(interpolatedPoint);
         this._drawPoint(ctx, interpolatedPoint, color);
       }
+
       for (let i = 0; i < nextPoints.length - 1; i++) {
         this._drawLine(ctx, nextPoints[i], nextPoints[i + 1], color, 2);
       }
+
       currentPoints = nextPoints;
       level++;
     }
