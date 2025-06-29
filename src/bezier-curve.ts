@@ -7,7 +7,7 @@ export class BezierCurve {
   private readonly width: number;
   private readonly height: number;
   private readonly duration: number;
-  private readonly colors: string[];
+  private readonly pointColors: string[];
   private readonly finalPointColor: string;
   private readonly tLabelElem: HTMLElement | null;
   private animationFrameId: number | null = null;
@@ -18,7 +18,7 @@ export class BezierCurve {
 
     this.points = options.points.slice();
     this.duration = options.duration ?? 4000;
-    this.colors = options.colors ?? ['#72CC7C', '#58BDED', '#F9A825', '#E91E63'];
+    this.pointColors = options.colors ?? ['#72CC7C', '#58BDED', '#F9A825', '#E91E63'];
     this.finalPointColor = options.finalPointColor ?? '#F9DE60';
 
     this.width = this.staticCtx.canvas.clientWidth;
@@ -73,7 +73,7 @@ export class BezierCurve {
     let level = 0;
 
     while (currentPoints.length > 1) {
-      const color = this.colors[level % this.colors.length];
+      const color = this.pointColors[level % this.pointColors.length];
       const nextPoints: Point[] = [];
       for (let i = 0; i < currentPoints.length - 1; i++) {
         const p1 = currentPoints[i];

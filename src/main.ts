@@ -46,4 +46,4 @@ function setupApp() {
   }
 }
 
-setupApp();
+document.addEventListener('DOMContentLoaded', setupApp);
