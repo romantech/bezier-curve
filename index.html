@@ -3,13 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <link href="/vite.svg" rel="icon" type="image/svg+xml" />
+    <link href="./src/style.css" rel="stylesheet" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Bezier Curve</title>
   </head>
   <body>
     <div id="app">
-      <h2 class="title">cubic bezier curves</h2>
-      <var class="t-label">t = 0</var>
+      <h2 class="title"><span class="degree-label"></span> bezier curves</h2>
+      <div class="t-display"><span>t = </span><span class="t-value"></span></div>
 
       <div class="canvas-container">
         <canvas class="static-canvas"></canvas>

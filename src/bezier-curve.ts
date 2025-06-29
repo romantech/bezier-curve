@@ -2,6 +2,8 @@ import type { BezierCurveOptions, Point } from './lib';
 
 export class BezierCurve {
   public points: Point[];
+  public readonly onTick: BezierCurveOptions['onTick'];
+
   private readonly staticCtx: CanvasRenderingContext2D;
   private readonly dynamicCtx: CanvasRenderingContext2D;
   private readonly width: number;
@@ -9,7 +11,6 @@ export class BezierCurve {
   private readonly duration: number;
   private readonly pointColors: string[];
   private readonly finalPointColor: string;
-  private readonly tLabelElem: HTMLElement | null;
   private animationFrameId: number | null = null;
 
   constructor(options: BezierCurveOptions) {
@@ -23,8 +24,7 @@ export class BezierCurve {
 
     this.width = this.staticCtx.canvas.width;
     this.height = this.staticCtx.canvas.height;
-
-    this.tLabelElem = options.tLabelElem ?? null;
+    this.onTick = options.onTick;
   }
 
   public drawStaticLayer(): void {
@@ -61,7 +61,8 @@ export class BezierCurve {
     // 제어점 및 레이블
     this.points.forEach((p, i) => {
       this._drawPoint(ctx, p, '#fff', 7);
-      this._drawLabel(ctx, p, `P${i}`, 8, -8);
+      const offsetX = i % 2 === 0 ? -26 : 10;
+      this._drawLabel(ctx, p, `P${i}`, offsetX, -8);
     });
   }
 
@@ -75,6 +76,7 @@ export class BezierCurve {
     while (currentPoints.length > 1) {
       const color = this.pointColors[level % this.pointColors.length];
       const nextPoints: Point[] = [];
+
       for (let i = 0; i < currentPoints.length - 1; i++) {
         const p1 = currentPoints[i];
         const p2 = currentPoints[i + 1];
@@ -82,9 +84,11 @@ export class BezierCurve {
         nextPoints.push(interpolatedPoint);
         this._drawPoint(ctx, interpolatedPoint, color);
       }
+
       for (let i = 0; i < nextPoints.length - 1; i++) {
         this._drawLine(ctx, nextPoints[i], nextPoints[i + 1], color, 2);
       }
+
       currentPoints = nextPoints;
       level++;
     }
@@ -110,7 +114,7 @@ export class BezierCurve {
       if (!startTime) startTime = now;
       const t = Math.min((now - startTime) / this.duration, 1);
 
-      this._setLabel(t);
+      this.onTick(t);
       this.drawDynamicLayer(t);
 
       if (t < 1) this.animationFrameId = requestAnimationFrame(animate);
@@ -122,17 +126,12 @@ export class BezierCurve {
   public reset() {
     this.drawStaticLayer();
     this.drawDynamicLayer(0);
-    this._setLabel(0);
+    this.onTick(0);
   }
 
   public setPoints(newPoints: Point[]) {
     this.points = newPoints.slice();
     return this;
-  }
-
-  private _setLabel(t: number) {
-    if (!this.tLabelElem) return;
-    this.tLabelElem.textContent = `t = ${t.toFixed(2)}`;
   }
 
   private _lerp(a: number, b: number, t: number): number {

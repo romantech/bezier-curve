@@ -1,26 +1,53 @@
 import type { DefinedElements } from './types';
 import { BezierPoints } from './bezier-points';
 
-export const getValidElements = () => {
-  const elements = {
-    $staticCv: document.querySelector<HTMLCanvasElement>('.static-canvas'),
-    $dynamicCv: document.querySelector<HTMLCanvasElement>('.dynamic-canvas'),
-    $title: document.querySelector<HTMLElement>('.title'),
-    $degreePicker: document.querySelector<HTMLSelectElement>('.degree-picker'),
-    $startBtn: document.querySelector<HTMLButtonElement>('.start-animation'),
-    $tLabel: document.querySelector<HTMLElement>('.t-label'),
-  };
+const UnsafeElements = {
+  $staticCanvas: document.querySelector<HTMLCanvasElement>('.static-canvas'),
+  $dynamicCanvas: document.querySelector<HTMLCanvasElement>('.dynamic-canvas'),
+  $degreeLabel: document.querySelector<HTMLElement>('.degree-label'),
+  $degreePicker: document.querySelector<HTMLSelectElement>('.degree-picker'),
+  $startBtn: document.querySelector<HTMLButtonElement>('.start-animation'),
+  $tLabel: document.querySelector<HTMLSpanElement>('.t-value'),
+};
 
-  if (Object.values(elements).some((el) => el === null)) {
-    throw new Error('필수 HTML 요소가 존재하지 않습니다.');
+type Elements = DefinedElements<typeof UnsafeElements>;
+
+export class UIController {
+  public readonly elements: Elements;
+
+  constructor() {
+    if (Object.values(UnsafeElements).some((el) => el === null)) {
+      throw new Error('필수 HTML 요소가 존재하지 않습니다.');
+    }
+
+    this.elements = UnsafeElements as Elements;
   }
 
-  return elements as DefinedElements<typeof elements>;
-};
+  public updateDegreeLabel(label: string) {
+    this.elements.$degreeLabel.textContent = label;
+  }
 
-export const populateDegreePicker = ($degreePicker: HTMLSelectElement, points = BezierPoints) => {
-  Object.keys(points).forEach((key, i) => {
-    const option = new Option(key, key, i === 0);
-    $degreePicker.appendChild(option);
-  });
-};
+  public populateDegreePicker(points = BezierPoints) {
+    const degreeKeys = Object.keys(points);
+    const initialKeyIdx = 0;
+
+    degreeKeys.forEach((key, i) => {
+      const option = new Option(key, key, i === initialKeyIdx);
+      this.elements.$degreePicker.appendChild(option);
+    });
+
+    return degreeKeys[initialKeyIdx];
+  }
+
+  public updateTLabel(tValue: number) {
+    this.elements.$tLabel.textContent = `${tValue.toFixed(2)}`;
+  }
+
+  public init() {
+    const initialDegree = this.populateDegreePicker();
+    this.updateDegreeLabel(initialDegree);
+  }
+}
+
+/** 싱글턴(단일 인스턴스)으로 사용 */
+export const uiController = new UIController();

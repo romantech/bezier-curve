@@ -1,3 +1,5 @@
+import type { UIController } from './dom';
+
 export type Degree = 'quadratic' | 'cubic' | 'quartic';
 
 export interface Point {
@@ -12,7 +14,7 @@ export interface BezierCurveOptions {
   duration?: number;
   pointColors?: string[];
   finalPointColor?: string;
-  tLabelElem?: HTMLElement | null;
+  onTick: UIController['updateTLabel'];
 }
 
 export type DefinedElements<T> = {
