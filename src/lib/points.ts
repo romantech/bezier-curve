@@ -1,32 +1,25 @@
-import type { CurveType, Point } from './types';
+import type { Degree, Point } from './types';
 
-export const getPoints = (curveType: CurveType): Point[] => {
-  switch (curveType) {
-    case 'quadratic': {
-      return [
-        { x: 50, y: 350 },
-        { x: 250, y: 50 },
-        { x: 450, y: 350 },
-      ];
-    }
-
-    case 'cubic': {
-      return [
-        { x: 50, y: 350 },
-        { x: 250, y: 350 },
-        { x: 250, y: 50 },
-        { x: 450, y: 50 },
-      ];
-    }
-
-    case 'quartic': {
-      return [
-        { x: 50, y: 200 },
-        { x: 150, y: 350 },
-        { x: 250, y: 50 },
-        { x: 350, y: 350 },
-        { x: 450, y: 200 },
-      ];
-    }
-  }
-};
+export const Points = {
+  /** 2차 베지에 곡선 */
+  quadratic: [
+    { x: 50, y: 350 },
+    { x: 250, y: 50 },
+    { x: 450, y: 350 },
+  ],
+  /** 3차 베지에 곡선 */
+  cubic: [
+    { x: 50, y: 350 },
+    { x: 250, y: 350 },
+    { x: 250, y: 50 },
+    { x: 450, y: 50 },
+  ],
+  /** 4차 베지에 곡선 */
+  quartic: [
+    { x: 50, y: 200 },
+    { x: 150, y: 350 },
+    { x: 250, y: 50 },
+    { x: 350, y: 350 },
+    { x: 450, y: 200 },
+  ],
+} satisfies Record<Degree, Point[]>;

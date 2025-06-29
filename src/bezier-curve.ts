@@ -9,13 +9,14 @@ export class BezierCurve {
   private readonly duration: number;
   private readonly colors: string[];
   private readonly finalPointColor: string;
-  private readonly labelElem: HTMLLabelElement | null;
+  private readonly tLabelElem: HTMLElement | null;
   private animationFrameId: number | null = null;
 
   constructor(options: BezierCurveOptions) {
     this.staticCtx = options.staticCtx;
     this.dynamicCtx = options.dynamicCtx;
-    this.points = options.points;
+
+    this.points = options.points.slice();
     this.duration = options.duration ?? 4000;
     this.colors = options.colors ?? ['#72CC7C', '#58BDED', '#F9A825', '#E91E63'];
     this.finalPointColor = options.finalPointColor ?? '#F9DE60';
@@ -23,7 +24,7 @@ export class BezierCurve {
     this.width = this.staticCtx.canvas.clientWidth;
     this.height = this.staticCtx.canvas.clientHeight;
 
-    this.labelElem = options.labelElem ?? null;
+    this.tLabelElem = options.tLabelElem ?? null;
   }
 
   public drawStaticLayer(): void {
@@ -95,19 +96,38 @@ export class BezierCurve {
     }
   }
 
-  public start(): void {
+  public stop(): void {
     if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
+    this.animationFrameId = null;
+  }
+
+  public start(): void {
+    this.stop();
 
     let startTime: number | null = null;
     const animate = (now: number): void => {
       if (!startTime) startTime = now;
       const t = Math.min((now - startTime) / this.duration, 1);
-      if (this.labelElem) this.labelElem.textContent = `t = ${t.toFixed(2)}`;
 
+      this._setLabel(t);
       this.drawDynamicLayer(t);
+
       if (t < 1) this.animationFrameId = requestAnimationFrame(animate);
     };
     this.animationFrameId = requestAnimationFrame(animate);
+  }
+
+  public setPoints(newPoints: Point[]): void {
+    this.points = newPoints;
+
+    this.drawStaticLayer();
+    this.drawDynamicLayer(0);
+    this._setLabel(0);
+  }
+
+  private _setLabel(t: number) {
+    if (!this.tLabelElem) return;
+    this.tLabelElem.textContent = `t = ${t.toFixed(2)}`;
   }
 
   private _lerp(a: number, b: number, t: number): number {

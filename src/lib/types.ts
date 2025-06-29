@@ -1,4 +1,4 @@
-export type CurveType = 'quadratic' | 'cubic' | 'quartic';
+export type Degree = 'quadratic' | 'cubic' | 'quartic';
 
 export interface Point {
   x: number;
@@ -12,5 +12,9 @@ export interface BezierCurveOptions {
   duration?: number;
   colors?: string[];
   finalPointColor?: string;
-  labelElem?: HTMLLabelElement | null;
+  tLabelElem?: HTMLElement | null;
 }
+
+export type DefinedElements<T> = {
+  [K in keyof T]: NonNullable<T[K]>;
+};

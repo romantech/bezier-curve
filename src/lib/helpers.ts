@@ -1,14 +1,20 @@
-export const validateDOMElements = () => {
-  const staticCanvas = document.querySelector<HTMLCanvasElement>('.static-canvas');
-  const dynamicCanvas = document.querySelector<HTMLCanvasElement>('.dynamic-canvas');
-  const startBtn = document.querySelector<HTMLButtonElement>('.start-animation');
-  const tLabel = document.querySelector<HTMLLabelElement>('.t-label');
+import type { DefinedElements } from './types';
 
-  if (!staticCanvas || !dynamicCanvas || !startBtn) {
+export const validateDOMElements = () => {
+  const elements = {
+    $staticCanvas: document.querySelector<HTMLCanvasElement>('.static-canvas'),
+    $dynamicCanvas: document.querySelector<HTMLCanvasElement>('.dynamic-canvas'),
+    $title: document.querySelector<HTMLElement>('.title'),
+    $degreePicker: document.querySelector<HTMLSelectElement>('.degree-picker'),
+    $startBtn: document.querySelector<HTMLButtonElement>('.start-animation'),
+    $tLabel: document.querySelector<HTMLElement>('.t-label'),
+  };
+
+  if (Object.values(elements).some((el) => el === null)) {
     throw new Error('필수 HTML 요소가 문서에 존재하지 않습니다.');
   }
 
-  return { staticCanvas, dynamicCanvas, startBtn, tLabel };
+  return elements as DefinedElements<typeof elements>;
 };
 
 export const setupCanvasContexts = (
