@@ -22,8 +22,8 @@ export class BezierCurve {
     this.pointColors = options.pointColors ?? ['#72CC7C', '#58BDED', '#F9A825', '#E91E63'];
     this.finalPointColor = options.finalPointColor ?? '#F9DE60';
 
-    this.width = this.staticCtx.canvas.width;
-    this.height = this.staticCtx.canvas.height;
+    this.width = this.staticCtx.canvas.clientWidth;
+    this.height = this.staticCtx.canvas.clientHeight;
     this.onTick = options.onTick;
   }
 
@@ -31,11 +31,13 @@ export class BezierCurve {
     const ctx = this.staticCtx;
     ctx.clearRect(0, 0, this.width, this.height);
 
-    // 격자
-    for (let x = 50; x < this.width; x += 50) {
+    const gridSize = this.width / 10;
+    // 세로 격자
+    for (let x = gridSize; x < this.width; x += gridSize) {
       this._drawLine(ctx, { x, y: 0 }, { x, y: this.height }, '#333');
     }
-    for (let y = 50; y < this.height; y += 50) {
+    // 가로 격자
+    for (let y = gridSize; y < this.height; y += gridSize) {
       this._drawLine(ctx, { x: 0, y }, { x: this.width, y }, '#333');
     }
 
