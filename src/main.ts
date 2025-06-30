@@ -48,4 +48,4 @@ function setupApp() {
   }
 }
 
-setupApp();
+window.addEventListener('DOMContentLoaded', setupApp);
