@@ -48,4 +48,8 @@ function setupApp() {
   }
 }
 
-window.addEventListener('DOMContentLoaded', setupApp);
+/**
+ * 첫 페이지 로드 시 경쟁 상태로 인해 캔버스 크기가 비정상적으로 출력되는 문제 해결 #14
+ * @see https://github.com/romantech/bezier-curve/issues/14
+ * */
+requestAnimationFrame(setupApp);
