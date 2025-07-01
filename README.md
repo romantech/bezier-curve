@@ -27,7 +27,7 @@ ease-in-out    /* cubic-bezier(0.42, 0, 0.58, 1) */
 ...
 ```
 
-A Bézier curve is a mathematical curve used in computer graphics to represent smooth curves, defined by a set of points called control points. Given `n` control points, a Bézier curve of degree `n-1` can be created. Image via [JavaScript Info](https://ko.javascript.info/bezier-curve#ref-1312).
+A Bézier curve is a mathematical curve used in computer graphics to represent smooth curves, defined by a set of points called control points. Given `n` control points, a Bézier curve of degree `n-1` can be created. Image via [JavaScript Info](https://javascript.info/bezier-curve#control-points).
 
 ![bezier-curves.png](/public/images/bezier-curves.png)
 
