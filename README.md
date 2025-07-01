@@ -1,7 +1,7 @@
 # Understanding Bézier Curves
 
 > - 베지에 곡선 원리 한국어로 읽기: https://romantech.net/1330
-> - Bezier Curves Animation Demo: https://romantech.github.io/bezier-curve
+> - Bezier Curve Animation Demo: https://romantech.github.io/bezier-curve
 
 In CSS, timing functions (acceleration curves) are used to control animations or transition effects. A timing function is a mathematical function that determines how quickly or slowly an animation starts and ends. Simply put, it controls the change in speed of an animation.
 
