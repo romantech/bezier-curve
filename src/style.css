@@ -1,8 +1,6 @@
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-
   color-scheme: light dark;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -84,14 +82,25 @@ body {
   border: 1px solid #444; /* 은은한 테두리 */
 
   /* 커스텀 드롭다운 화살표 (SVG 인코딩) */
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+  background-image: url('/public/chevron-down.svg');
   background-repeat: no-repeat;
   background-position: right 10px center;
-  background-size: 0.8em;
+  background-size: 1.1rem;
 }
 
 .t-display {
   font-weight: 600;
   color: #f9de60;
   font-style: italic;
+}
+
+.github-link {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+
+  & > img {
+    width: 28px;
+    height: 28px;
+  }
 }

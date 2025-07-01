@@ -200,7 +200,7 @@ export class BezierCurve {
     ctx.lineTo(end.x, end.y); // 끝점까지 선 추가
     ctx.strokeStyle = color; // 선 색상 설정
     ctx.lineWidth = width; // 선 두께 설정
-    ctx.stroke(); // 설정한 스타일로 지정한 경로 그리기(캔버스에 렌더링)
+    ctx.stroke(); // 캔버스에 렌더링
   }
 
   private _drawPoint(ctx: CanvasRenderingContext2D, point: Point, color: string, size = 6): void {
