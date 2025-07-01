@@ -27,7 +27,7 @@ ease-in-out    /* cubic-bezier(0.42, 0, 0.58, 1) */
 ...
 ```
 
-A Bézier curve is a mathematical curve used in computer graphics to represent smooth curves, defined by a set of points called control points. Given `n` control points, a Bézier curve of degree `n-1` can be created.
+A Bézier curve is a mathematical curve used in computer graphics to represent smooth curves, defined by a set of points called control points. Given `n` control points, a Bézier curve of degree `n-1` can be created. Image via [JavaScript Info](https://ko.javascript.info/bezier-curve#ref-1312).
 
 ![bezier-curves.png](/public/images/bezier-curves.png)
 
@@ -61,8 +61,6 @@ Linear interpolation is the most representative and simple of these interpolatio
 
 ## Quadratic Bézier Curve
 
----
-
 First, connect the three control points `A`, `B`, and `C` with straight lines. This creates two line segments: `AB` and `BC`.
 
 ![quadratic-bezier-curve-01.png](/public/images/quadratic-bezier-curve-01.png)
@@ -88,8 +86,6 @@ Let's see how a quadratic Bézier curve is drawn through the GIF image below.
 ![Quadratic Bézier Curve Animation](/public/images/quadratic-bezier-curves-animation.gif)
 
 ## Cubic Bézier Curve
-
----
 
 A cubic Bézier curve consists of four control points. The basic principle of creating the curve is the same as for a quadratic Bézier curve, but since there is one additional control point, the linear interpolation process is repeated one more time.
 
@@ -122,8 +118,6 @@ Let's see how a cubic Bézier curve is drawn through the GIF image below.
 ![Cubic Bézier Curve Animation](/public/images/cubic-bezier-curves-animation.gif)
 
 ## Understanding the Bézier Curve's Mathematical Formula
-
----
 
 ### 1st-Degree Bézier Curve (2 Control Points)
 
@@ -231,8 +225,6 @@ Higher-order Bézier curves, such as cubic and quartic curves, are created by re
 For reference, terms like $(1-t)^2$, $2(1-t)t$, and $t^2$ that are multiplied in front of each control point are called Bernstein basis polynomials. These terms determine how much influence (weight) each control point has on the point $P$ on the curve, depending on the value of $t$.
 
 ## Slope of Bézier Curves
-
----
 
 Below are examples of various Bézier curves. Image via [Josh Collins Worth](https://joshcollinsworth.com/demos/easing).
 
