@@ -1,16 +1,22 @@
 import type { DefinedElements, Degree, Point } from './types';
 import { BezierDegreeKeys, BezierPointRatios } from './bezier-points';
-import type { BezierCurve } from '../bezier-curve.ts';
+import type { BezierCurve } from '../bezier-curve';
 
 const UnsafeElements = {
   $staticCanvas: document.querySelector<HTMLCanvasElement>('.static-canvas'),
   $dynamicCanvas: document.querySelector<HTMLCanvasElement>('.dynamic-canvas'),
+
   $degreeLabel: document.querySelector<HTMLElement>('.degree-label'),
   $degreePicker: document.querySelector<HTMLSelectElement>('.degree-picker'),
-  $startBtn: document.querySelector<HTMLButtonElement>('.start-animation'),
+
   $tLabel: document.querySelector<HTMLSpanElement>('.t-value'),
+
   $duration: document.querySelector<HTMLDivElement>('.duration'),
   $durationValue: document.querySelector<HTMLSpanElement>('.duration-value'),
+
+  $startBtn: document.querySelector<HTMLButtonElement>('.start-animation'),
+  $decreaseBtn: document.querySelector<HTMLButtonElement>('button[data-action="decrease"]'),
+  $increaseBtn: document.querySelector<HTMLButtonElement>('button[data-action="increase"]'),
 };
 
 type Elements = DefinedElements<typeof UnsafeElements>;
@@ -47,12 +53,14 @@ export class UIController {
 
   public updateDurationValue(duration: number) {
     this.elements.$durationValue.textContent = `${Math.trunc(duration / 1000)}`;
+    this.elements.$durationValue.dataset.value = `${duration}`;
   }
 
   public init() {
     const initialDegree = this.populateDegreePicker();
     this.updateDegreeLabel(initialDegree);
     this.updateDurationValue(4000);
+    this._updateDurationButtonStates();
     return this;
   }
 
@@ -71,12 +79,21 @@ export class UIController {
     $duration.addEventListener('click', (e) => {
       const btn = (e.target as HTMLElement).closest('button');
       if (!btn) return;
-      const action = btn.dataset.action as 'increase' | 'decrease' | undefined;
-      if (!action) return;
+      const action = btn.dataset.action;
+      if (action !== 'increase' && action !== 'decrease') return;
 
-      const newDur = bezierCurve.changeDuration(action);
-      this.updateDurationValue(newDur);
+      const newDuration = bezierCurve.changeDuration(action);
+      this.updateDurationValue(newDuration);
+      this._updateDurationButtonStates();
     });
+  }
+
+  private _updateDurationButtonStates() {
+    const { $durationValue, $decreaseBtn, $increaseBtn } = this.elements;
+
+    const ms = parseInt($durationValue.dataset.value ?? '4000', 10);
+    $decreaseBtn.disabled = ms <= 1000;
+    $increaseBtn.disabled = ms >= 10000;
   }
 }
 
