@@ -1,7 +1,6 @@
 import {
   BezierPointRatios,
   createPointMapper,
-  type Degree,
   setupCanvasCtx,
   setupCanvasResolution,
   uiController,
@@ -9,8 +8,7 @@ import {
 import { BezierCurve } from './bezier-curve';
 
 function setupApp() {
-  const { $staticCanvas, $dynamicCanvas, $degreePicker, $startBtn, $duration } =
-    uiController.elements;
+  const { $staticCanvas, $dynamicCanvas } = uiController.elements;
   try {
     const { staticCtx, dynamicCtx } = setupCanvasCtx($staticCanvas, $dynamicCanvas);
 
@@ -30,27 +28,8 @@ function setupApp() {
       onTick: uiController.updateTLabel.bind(uiController),
     });
 
-    uiController.init();
     bezierCurve.reset();
-
-    $startBtn.addEventListener('click', bezierCurve.start.bind(bezierCurve));
-    $degreePicker.addEventListener('change', (e) => {
-      const selectedDegree = (e.target as HTMLSelectElement).value as Degree;
-      const points = mapPoints(BezierPointRatios[selectedDegree]);
-
-      uiController.updateDegreeLabel(selectedDegree);
-      bezierCurve.setPoints(points).reset();
-    });
-    $duration.addEventListener('click', (e) => {
-      const btn = (e.target as HTMLElement).closest('button');
-      if (!btn) return;
-
-      const raw = btn.dataset.action;
-      if (raw !== 'increase' && raw !== 'decrease') return;
-
-      const updatedDuration = bezierCurve.changeDuration(raw);
-      uiController.updateDurationValue(updatedDuration);
-    });
+    uiController.init().bindEvents(bezierCurve, mapPoints);
   } catch (e) {
     console.error('앱 초기화 실패:', e);
     document.body.innerHTML = '<div class="error">앱을 초기화할 수 없습니다.</div>';
