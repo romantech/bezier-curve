@@ -44,7 +44,8 @@ body {
 }
 
 .start-animation,
-.degree-picker {
+.degree-picker,
+.duration > button {
   text-transform: capitalize;
   background-color: #222;
   font-size: 16px;
@@ -57,7 +58,8 @@ body {
 }
 
 .start-animation:hover,
-.degree-picker:hover {
+.degree-picker:hover,
+.duration > button:hover {
   background-color: #444;
 }
 
@@ -103,4 +105,29 @@ body {
     width: 28px;
     height: 28px;
   }
+}
+
+.duration {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+
+.duration-display {
+  border: 1px solid #1e1e1e;
+  padding: 8px 0;
+  border-radius: 5px;
+  user-select: none;
+  width: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.duration > button {
+  border: none;
+  padding: 10px;
+  display: grid;
+  place-items: center;
 }

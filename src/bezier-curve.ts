@@ -2,6 +2,8 @@ import type { BezierCurveOptions, Point } from './lib';
 
 export class BezierCurve {
   public points: Point[];
+  /* 애니메이션 진행 시간 1000(ms) ~ 10000(ms) */
+  public duration: number;
   /** t 값이 증가했을 때 수행할 액션 */
   public readonly onTick: BezierCurveOptions['onTick'];
 
@@ -9,7 +11,6 @@ export class BezierCurve {
   private readonly dynamicCtx: CanvasRenderingContext2D;
   private readonly width: number;
   private readonly height: number;
-  private readonly duration: number;
   private readonly pointColors: string[];
   private readonly finalPointColor: string;
   private animationFrameId: number | null = null;
@@ -133,6 +134,7 @@ export class BezierCurve {
   }
 
   public reset() {
+    this.stop();
     this.drawStaticLayer();
     this.drawDynamicLayer(0);
     this.onTick(0);
@@ -141,6 +143,16 @@ export class BezierCurve {
   public setPoints(newPoints: Point[]) {
     this.points = newPoints.slice();
     return this;
+  }
+
+  public changeDuration(action: 'increase' | 'decrease') {
+    const delta = action === 'increase' ? 1000 : -1000;
+    this.duration = this.clampDuration(delta + this.duration);
+    return this.duration;
+  }
+
+  private clampDuration(value: number): number {
+    return Math.min(10000, Math.max(1000, value));
   }
 
   /**
