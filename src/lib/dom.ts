@@ -9,6 +9,7 @@ const UnsafeElements = {
   $startBtn: document.querySelector<HTMLButtonElement>('.start-animation'),
   $tLabel: document.querySelector<HTMLSpanElement>('.t-value'),
   $duration: document.querySelector<HTMLDivElement>('.duration'),
+  $durationValue: document.querySelector<HTMLSpanElement>('.duration-value'),
 };
 
 type Elements = DefinedElements<typeof UnsafeElements>;
@@ -43,9 +44,14 @@ export class UIController {
     this.elements.$tLabel.textContent = `${tValue.toFixed(2)}`;
   }
 
+  public updateDurationValue(duration: number) {
+    this.elements.$durationValue.textContent = `${Math.trunc(duration / 1000)}`;
+  }
+
   public init() {
     const initialDegree = this.populateDegreePicker();
     this.updateDegreeLabel(initialDegree);
+    this.updateDurationValue(4000);
   }
 }
 

@@ -34,20 +34,22 @@ function setupApp() {
     bezierCurve.reset();
 
     $startBtn.addEventListener('click', bezierCurve.start.bind(bezierCurve));
-    $degreePicker.addEventListener('change', (event) => {
-      if (!(event.target instanceof HTMLSelectElement)) return;
-
-      const selectedDegree = event.target.value as Degree;
+    $degreePicker.addEventListener('change', (e) => {
+      const selectedDegree = (e.target as HTMLSelectElement).value as Degree;
       const points = mapPoints(BezierPointRatios[selectedDegree]);
 
       uiController.updateDegreeLabel(selectedDegree);
-      bezierCurve.stop().setPoints(points).reset();
+      bezierCurve.setPoints(points).reset();
     });
-    $duration.addEventListener('click', ({ target }) => {
-      if (!(target instanceof Element)) return;
+    $duration.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest('button');
+      if (!btn) return;
 
-      const clickedBtn = target.closest('button');
-      console.log(clickedBtn);
+      const raw = btn.dataset.action;
+      if (raw !== 'increase' && raw !== 'decrease') return;
+
+      const updatedDuration = bezierCurve.changeDuration(raw);
+      uiController.updateDurationValue(updatedDuration);
     });
   } catch (e) {
     console.error('앱 초기화 실패:', e);

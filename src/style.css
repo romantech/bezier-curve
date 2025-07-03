@@ -116,9 +116,13 @@ body {
 
 .duration-display {
   border: 1px solid #1e1e1e;
-  padding: 8px 12px;
+  padding: 8px 0;
   border-radius: 5px;
   user-select: none;
+  width: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .duration > button {
