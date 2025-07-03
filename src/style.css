@@ -47,8 +47,8 @@ body {
 .degree-picker,
 .duration > button {
   text-transform: capitalize;
-  background-color: #222;
-  font-size: 16px;
+  background-color: #333;
+  font-size: 15px;
   border-radius: 5px;
   cursor: pointer;
   color: white;
@@ -63,10 +63,16 @@ body {
   background-color: #444;
 }
 
+.start-animation:active,
+.degree-picker:active,
+.duration > button:active {
+  opacity: 0.8;
+}
+
 .controls {
   display: flex;
   justify-content: center;
-  gap: 1rem;
+  gap: 12px;
 }
 
 .title {
@@ -102,8 +108,8 @@ body {
   right: 16px;
 
   & > img {
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
   }
 }
 
@@ -115,14 +121,15 @@ body {
 }
 
 .duration-display {
-  border: 1px solid #1e1e1e;
+  border: 1px solid #2f2f2f;
   padding: 8px 0;
   border-radius: 5px;
   user-select: none;
-  width: 50px;
+  width: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 15px;
 }
 
 .duration > button {
@@ -130,4 +137,10 @@ body {
   padding: 10px;
   display: grid;
   place-items: center;
+  user-select: none;
+}
+
+.duration > button:disabled {
+  opacity: 0.5;
+  pointer-events: none;
 }
