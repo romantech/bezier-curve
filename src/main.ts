@@ -9,7 +9,8 @@ import {
 import { BezierCurve } from './bezier-curve';
 
 function setupApp() {
-  const { $staticCanvas, $dynamicCanvas, $degreePicker, $startBtn } = uiController.elements;
+  const { $staticCanvas, $dynamicCanvas, $degreePicker, $startBtn, $duration } =
+    uiController.elements;
   try {
     const { staticCtx, dynamicCtx } = setupCanvasCtx($staticCanvas, $dynamicCanvas);
 
@@ -33,7 +34,7 @@ function setupApp() {
     bezierCurve.reset();
 
     $startBtn.addEventListener('click', bezierCurve.start.bind(bezierCurve));
-    $degreePicker?.addEventListener('change', (event) => {
+    $degreePicker.addEventListener('change', (event) => {
       if (!(event.target instanceof HTMLSelectElement)) return;
 
       const selectedDegree = event.target.value as Degree;
@@ -41,6 +42,12 @@ function setupApp() {
 
       uiController.updateDegreeLabel(selectedDegree);
       bezierCurve.stop().setPoints(points).reset();
+    });
+    $duration.addEventListener('click', ({ target }) => {
+      if (!(target instanceof Element)) return;
+
+      const clickedBtn = target.closest('button');
+      console.log(clickedBtn);
     });
   } catch (e) {
     console.error('앱 초기화 실패:', e);

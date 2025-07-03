@@ -45,7 +45,7 @@ body {
 
 .start-animation,
 .degree-picker,
-.speed-control > button {
+.duration > button {
   text-transform: capitalize;
   background-color: #222;
   font-size: 16px;
@@ -59,7 +59,7 @@ body {
 
 .start-animation:hover,
 .degree-picker:hover,
-.speed-control > button:hover {
+.duration > button:hover {
   background-color: #444;
 }
 
@@ -107,21 +107,21 @@ body {
   }
 }
 
-.speed-control {
+.duration {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 4px;
 }
 
-.speed-display {
+.duration-display {
   border: 1px solid #1e1e1e;
   padding: 8px 12px;
   border-radius: 5px;
   user-select: none;
 }
 
-.speed-control > button {
+.duration > button {
   border: none;
   padding: 10px;
   display: grid;

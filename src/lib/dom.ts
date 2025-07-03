@@ -8,6 +8,7 @@ const UnsafeElements = {
   $degreePicker: document.querySelector<HTMLSelectElement>('.degree-picker'),
   $startBtn: document.querySelector<HTMLButtonElement>('.start-animation'),
   $tLabel: document.querySelector<HTMLSpanElement>('.t-value'),
+  $duration: document.querySelector<HTMLDivElement>('.duration'),
 };
 
 type Elements = DefinedElements<typeof UnsafeElements>;
