@@ -1,11 +1,11 @@
 import type { UIController } from './dom';
 
-export type Degree = 'quadratic' | 'cubic' | 'quartic';
-
 export interface Point {
   x: number;
   y: number;
 }
+
+export type PointList = Point[];
 
 export interface BezierCurveOptions {
   staticCtx: CanvasRenderingContext2D;
@@ -15,6 +15,7 @@ export interface BezierCurveOptions {
   pointColors?: string[];
   finalPointColor?: string;
   onTick: UIController['updateTLabel'];
+  onStop: UIController['updateToggleLabel'];
 }
 
 export type DefinedElements<T> = {

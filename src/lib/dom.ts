@@ -1,7 +1,7 @@
-import type { DefinedElements, Degree, Point } from './types';
-import { BezierDegreeKeys, BezierPointRatios } from './bezier-points';
+import type { DefinedElements, Point } from './types';
+import { type BezierCurveKey, BezierCurveKeys, BezierPointRatios } from './bezier-points';
 import type { BezierCurve } from '../bezier-curve';
-import { CONFIG } from './config';
+import { ACTION, DURATION } from './config';
 
 const UnsafeElements = {
   $staticCanvas: document.querySelector<HTMLCanvasElement>('.static-canvas'),
@@ -15,7 +15,7 @@ const UnsafeElements = {
   $duration: document.querySelector<HTMLDivElement>('.duration'),
   $durationValue: document.querySelector<HTMLSpanElement>('.duration-value'),
 
-  $startBtn: document.querySelector<HTMLButtonElement>('.start-animation'),
+  $toggleBtn: document.querySelector<HTMLButtonElement>('.toggle-button'),
   $decreaseBtn: document.querySelector<HTMLButtonElement>('button[data-action="decrease"]'),
   $increaseBtn: document.querySelector<HTMLButtonElement>('button[data-action="increase"]'),
 };
@@ -37,7 +37,7 @@ export class UIController {
     this.elements.$degreeLabel.textContent = label;
   }
 
-  public populateDegreePicker(degreeKeys = BezierDegreeKeys) {
+  public populateDegreePicker(degreeKeys = BezierCurveKeys) {
     const initialKeyIdx = 0;
 
     degreeKeys.forEach((key, i) => {
@@ -48,8 +48,12 @@ export class UIController {
     return degreeKeys[initialKeyIdx];
   }
 
-  public updateTLabel(tValue: number) {
-    this.elements.$tLabel.textContent = `${tValue.toFixed(2)}`;
+  public updateTLabel(value: number) {
+    this.elements.$tLabel.textContent = `${value.toFixed(2)}`;
+  }
+
+  public updateToggleLabel(nextActionLabel: string) {
+    this.elements.$toggleBtn.textContent = nextActionLabel;
   }
 
   public updateDurationValue(duration: number) {
@@ -60,18 +64,21 @@ export class UIController {
   public init() {
     const initialDegree = this.populateDegreePicker();
     this.updateDegreeLabel(initialDegree);
-    this.updateDurationValue(CONFIG.DURATION.DEFAULT);
+    this.updateDurationValue(DURATION.DEFAULT);
     this._updateDurationButtonStates();
     return this;
   }
 
   public bindEvents(bezierCurve: BezierCurve, mapPoints: (ratioPts: Point[]) => Point[]) {
-    const { $startBtn, $degreePicker, $duration } = this.elements;
+    const { $toggleBtn, $degreePicker, $duration } = this.elements;
 
-    $startBtn.addEventListener('click', () => bezierCurve.start());
+    $toggleBtn.addEventListener('click', () => {
+      bezierCurve.togglePlayPause();
+      $toggleBtn.textContent = bezierCurve.nextActionLabel;
+    });
 
     $degreePicker.addEventListener('change', (e) => {
-      const selected = (e.target as HTMLSelectElement).value as Degree;
+      const selected = (e.target as HTMLSelectElement).value as BezierCurveKey;
       const pts = mapPoints(BezierPointRatios[selected]);
       this.updateDegreeLabel(selected);
       bezierCurve.setPoints(pts).reset();
@@ -81,7 +88,7 @@ export class UIController {
       const btn = (e.target as HTMLElement).closest('button');
       if (!btn) return;
       const action = btn.dataset.action;
-      if (action !== 'increase' && action !== 'decrease') return;
+      if (action !== ACTION.INCREASE && action !== ACTION.DECREASE) return;
 
       const newDuration = bezierCurve.changeDuration(action);
       this.updateDurationValue(newDuration);
@@ -92,9 +99,9 @@ export class UIController {
   private _updateDurationButtonStates() {
     const { $durationValue, $decreaseBtn, $increaseBtn } = this.elements;
 
-    const ms = parseInt($durationValue.dataset.value ?? `${CONFIG.DURATION.DEFAULT}`, 10);
-    $decreaseBtn.disabled = ms <= CONFIG.DURATION.MIN;
-    $increaseBtn.disabled = ms >= CONFIG.DURATION.MAX;
+    const ms = parseInt($durationValue.dataset.value ?? `${DURATION.DEFAULT}`, 10);
+    $decreaseBtn.disabled = ms <= DURATION.MIN;
+    $increaseBtn.disabled = ms >= DURATION.MAX;
   }
 }
 
