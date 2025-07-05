@@ -16,6 +16,7 @@ const UnsafeElements = {
   $durationValue: document.querySelector<HTMLSpanElement>('.duration-value'),
 
   $startBtn: document.querySelector<HTMLButtonElement>('.start-animation'),
+  $pauseBtn: document.querySelector<HTMLButtonElement>('.pause-animation'),
   $decreaseBtn: document.querySelector<HTMLButtonElement>('button[data-action="decrease"]'),
   $increaseBtn: document.querySelector<HTMLButtonElement>('button[data-action="increase"]'),
 };
@@ -66,9 +67,10 @@ export class UIController {
   }
 
   public bindEvents(bezierCurve: BezierCurve, mapPoints: (ratioPts: Point[]) => Point[]) {
-    const { $startBtn, $degreePicker, $duration } = this.elements;
+    const { $startBtn, $degreePicker, $duration, $pauseBtn } = this.elements;
 
     $startBtn.addEventListener('click', () => bezierCurve.start());
+    $pauseBtn.addEventListener('click', () => bezierCurve.pause());
 
     $degreePicker.addEventListener('change', (e) => {
       const selected = (e.target as HTMLSelectElement).value as BezierCurveKey;

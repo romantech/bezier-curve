@@ -2,10 +2,12 @@ import { ACTION, type Action, type BezierCurveOptions, DURATION, type Point, STY
 
 export class BezierCurve {
   public points: Point[];
-  /* 애니메이션 진행 시간 1000(ms) ~ 10000(ms) */
+  /** 애니메이션 진행 시간 1000(ms) ~ 10000(ms) */
   public duration: number;
   /** t 값이 증가했을 때 수행할 액션 */
   public readonly onTick: BezierCurveOptions['onTick'];
+  public isPaused: boolean = false;
+  public elapsedTime: number = 0;
 
   private readonly staticCtx: CanvasRenderingContext2D;
   private readonly dynamicCtx: CanvasRenderingContext2D;
@@ -110,24 +112,42 @@ export class BezierCurve {
   }
 
   public stop() {
-    if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
-    this.animationFrameId = null;
-    return this;
+    this._cancelAnimation();
+    this.isPaused = false;
+    this.elapsedTime = 0;
+  }
+
+  public pause() {
+    this._cancelAnimation();
+    this.isPaused = true;
   }
 
   public start(): void {
-    this.stop();
+    if (this.animationFrameId) return;
 
+    this.isPaused = false;
     let startTime: number | null = null;
-    const animate = (now: number): void => {
-      if (!startTime) startTime = now;
 
-      const t = Math.min((now - startTime) / this.duration, 1);
+    /**
+     * 애니메이션 프레임 콜백
+     * @param {number} now 페이지 로드 이후 경과 시간(ms). `performance.now()`와 동일한 값 */
+    const animate = (now: number): void => {
+      /**
+       * 시작 시간 보정 (시작 혹은 재개 대응)
+       * 애니메이션 2초 경과 후 일시정지하면, this.elapsedTime = 2000
+       * 이후 애니메이션 재개 시, startTime을 '현재시간(now) - 경과시간(2000)'으로 보정하여
+       * 다음 프레임의 경과 시간이 2000부터 시작되도록 만듦.
+       */
+      if (!startTime) startTime = now - this.elapsedTime;
+
+      this.elapsedTime = now - startTime;
+      const t = Math.min(this.elapsedTime / this.duration, 1);
+
       this.onTick(t);
       this.drawDynamicLayer(t); // 매 프레임마다 동적 레이어 다시 렌더링
 
       if (t < 1) this.animationFrameId = requestAnimationFrame(animate);
-      else this.animationFrameId = null;
+      else this.stop();
     };
 
     this.animationFrameId = requestAnimationFrame(animate);
@@ -147,11 +167,18 @@ export class BezierCurve {
 
   public changeDuration(action: Action) {
     const delta = action === ACTION.INCREASE ? DURATION.STEP : -DURATION.STEP;
-    this.duration = this.clampDuration(delta + this.duration);
+    this.duration = this._clampDuration(delta + this.duration);
     return this.duration;
   }
 
-  private clampDuration(value: number): number {
+  private _cancelAnimation(): void {
+    if (!this.animationFrameId) return;
+
+    cancelAnimationFrame(this.animationFrameId);
+    this.animationFrameId = null;
+  }
+
+  private _clampDuration(value: number): number {
     return Math.min(DURATION.MAX, Math.max(DURATION.MIN, value));
   }
 
