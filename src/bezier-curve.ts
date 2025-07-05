@@ -7,8 +7,14 @@ export class BezierCurve {
   private elapsedTime: number = 0;
   private animationFrameId: number | null = null;
 
-  /** t 값이 증가했을 때 수행할 액션 */
+  /**
+   * t 값이 증가했을 때 수행할 액션.
+   * tick은 애니메이션 루프에서 한 번의 업데이트 사이클을 가리킴
+   * requestAnimationFrame과 함께쓰면 프레임 단위로 호출되므로 사실상 tick = 프레임
+   * */
   private readonly onTick: BezierCurveOptions['onTick'];
+  /** 애니메이션이 중지(stop)됐을 때 수행할 액션 */
+  private readonly onStop: BezierCurveOptions['onStop'];
   private readonly staticCtx: CanvasRenderingContext2D;
   private readonly dynamicCtx: CanvasRenderingContext2D;
   private readonly width: number;
@@ -28,6 +34,7 @@ export class BezierCurve {
     this.width = this.staticCtx.canvas.clientWidth;
     this.height = this.staticCtx.canvas.clientHeight;
     this.onTick = options.onTick;
+    this.onStop = options.onStop;
   }
 
   public get nextActionLabel() {
@@ -119,11 +126,14 @@ export class BezierCurve {
     this[methodName]();
   }
 
+  /** 애니메이션 정지. 다음 start() 호출 시 처음부터 시작 */
   public stop() {
     this._cancelAnimation();
     this.elapsedTime = 0;
+    this.onStop(this.nextActionLabel);
   }
 
+  /** 애니메이션 일시정지. 다음 start() 호출 시 정지 시점부터 이어서 재생 */
   public pause() {
     this._cancelAnimation();
   }

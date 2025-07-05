@@ -48,8 +48,12 @@ export class UIController {
     return degreeKeys[initialKeyIdx];
   }
 
-  public updateTLabel(tValue: number) {
-    this.elements.$tLabel.textContent = `${tValue.toFixed(2)}`;
+  public updateTLabel(value: number) {
+    this.elements.$tLabel.textContent = `${value.toFixed(2)}`;
+  }
+
+  public updateToggleLabel(nextActionLabel: string) {
+    this.elements.$toggleBtn.textContent = nextActionLabel;
   }
 
   public updateDurationValue(duration: number) {

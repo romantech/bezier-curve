@@ -15,6 +15,7 @@ export interface BezierCurveOptions {
   pointColors?: string[];
   finalPointColor?: string;
   onTick: UIController['updateTLabel'];
+  onStop: UIController['updateToggleLabel'];
 }
 
 export type DefinedElements<T> = {

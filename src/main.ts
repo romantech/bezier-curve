@@ -26,6 +26,7 @@ function setupApp() {
       dynamicCtx,
       points: mapPoints(BezierPointRatios.quadratic),
       onTick: uiController.updateTLabel.bind(uiController),
+      onStop: uiController.updateToggleLabel.bind(uiController),
     });
 
     bezierCurve.reset();
