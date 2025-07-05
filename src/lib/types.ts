@@ -1,11 +1,11 @@
 import type { UIController } from './dom';
 
-export type Degree = 'quadratic' | 'cubic' | 'quartic';
-
 export interface Point {
   x: number;
   y: number;
 }
+
+export type PointList = Point[];
 
 export interface BezierCurveOptions {
   staticCtx: CanvasRenderingContext2D;

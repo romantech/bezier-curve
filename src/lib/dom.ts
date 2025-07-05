@@ -1,5 +1,5 @@
-import type { DefinedElements, Degree, Point } from './types';
-import { BezierDegreeKeys, BezierPointRatios } from './bezier-points';
+import type { DefinedElements, Point } from './types';
+import { type BezierCurveKey, BezierCurveKeys, BezierPointRatios } from './bezier-points';
 import type { BezierCurve } from '../bezier-curve';
 import { ACTION, DURATION } from './config';
 
@@ -37,7 +37,7 @@ export class UIController {
     this.elements.$degreeLabel.textContent = label;
   }
 
-  public populateDegreePicker(degreeKeys = BezierDegreeKeys) {
+  public populateDegreePicker(degreeKeys = BezierCurveKeys) {
     const initialKeyIdx = 0;
 
     degreeKeys.forEach((key, i) => {
@@ -71,7 +71,7 @@ export class UIController {
     $startBtn.addEventListener('click', () => bezierCurve.start());
 
     $degreePicker.addEventListener('change', (e) => {
-      const selected = (e.target as HTMLSelectElement).value as Degree;
+      const selected = (e.target as HTMLSelectElement).value as BezierCurveKey;
       const pts = mapPoints(BezierPointRatios[selected]);
       this.updateDegreeLabel(selected);
       bezierCurve.setPoints(pts).reset();

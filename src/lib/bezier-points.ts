@@ -1,4 +1,4 @@
-import type { Degree, Point } from './types';
+import type { Point, PointList } from './types';
 
 export const BezierPointRatios = {
   /** 2차 베지에 곡선 비율 */
@@ -34,9 +34,10 @@ export const BezierPointRatios = {
     /** x: 450, y: 200 */
     { x: 0.9, y: 0.5 },
   ],
-} satisfies Record<Degree, Point[]>;
+} satisfies Record<string, PointList>;
 
-export const BezierDegreeKeys = Object.keys(BezierPointRatios);
+export type BezierCurveKey = keyof typeof BezierPointRatios;
+export const BezierCurveKeys = Object.keys(BezierPointRatios) as readonly BezierCurveKey[];
 
 export const createPointMapper = (width: number, height: number) => {
   return (ratioPoints: Point[]) =>
