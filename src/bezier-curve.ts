@@ -1,21 +1,20 @@
 import { ACTION, type Action, type BezierCurveOptions, DURATION, type Point, STYLE } from './lib';
 
 export class BezierCurve {
-  public points: Point[];
+  private points: Point[];
   /** 애니메이션 진행 시간 1000(ms) ~ 10000(ms) */
-  public duration: number;
-  /** t 값이 증가했을 때 수행할 액션 */
-  public readonly onTick: BezierCurveOptions['onTick'];
-  public isPaused: boolean = false;
-  public elapsedTime: number = 0;
+  private duration: number;
+  private elapsedTime: number = 0;
+  private animationFrameId: number | null = null;
 
+  /** t 값이 증가했을 때 수행할 액션 */
+  private readonly onTick: BezierCurveOptions['onTick'];
   private readonly staticCtx: CanvasRenderingContext2D;
   private readonly dynamicCtx: CanvasRenderingContext2D;
   private readonly width: number;
   private readonly height: number;
   private readonly pointColors: readonly string[];
   private readonly finalPointColor: string;
-  private animationFrameId: number | null = null;
 
   constructor(options: BezierCurveOptions) {
     this.staticCtx = options.staticCtx;
@@ -29,6 +28,10 @@ export class BezierCurve {
     this.width = this.staticCtx.canvas.clientWidth;
     this.height = this.staticCtx.canvas.clientHeight;
     this.onTick = options.onTick;
+  }
+
+  public get nextActionLabel() {
+    return this.animationFrameId ? 'pause' : 'start';
   }
 
   /** 베지에 곡선 가이드, 초기 조절점/레이블 같은 정적 요소 렌더링 */
@@ -111,21 +114,23 @@ export class BezierCurve {
     this._drawLabel(ctx, finalPoint, 'P', -20, 20);
   }
 
+  public togglePlayPause() {
+    const methodName = this.nextActionLabel;
+    this[methodName]();
+  }
+
   public stop() {
     this._cancelAnimation();
-    this.isPaused = false;
     this.elapsedTime = 0;
   }
 
   public pause() {
     this._cancelAnimation();
-    this.isPaused = true;
   }
 
   public start(): void {
     if (this.animationFrameId) return;
 
-    this.isPaused = false;
     let startTime: number | null = null;
 
     /**

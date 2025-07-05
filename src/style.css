@@ -38,16 +38,13 @@ body {
   height: 100%;
 }
 
-.pause-animation,
-.start-animation {
+.toggle-button {
   border: none;
-  padding: 10px 20px;
+  padding: 10px 0;
+  width: 76px;
 }
 
-.pause-animation,
-.start-animation,
-.degree-picker,
-.duration > button {
+:is(.toggle-button, .degree-picker, .duration > button) {
   text-transform: capitalize;
   background-color: #333;
   font-size: 15px;
@@ -59,16 +56,11 @@ body {
     border-color 0.3s;
 }
 
-.pause-animation:hover,
-.start-animation:hover,
-.degree-picker:hover,
-.duration > button:hover {
+:is(.toggle-button, .degree-picker, .duration > button):hover {
   background-color: #444;
 }
 
-.start-animation:active,
-.degree-picker:active,
-.duration > button:active {
+:is(.toggle-button, .degree-picker, .duration > button):active {
   opacity: 0.8;
 }
 
