@@ -1,7 +1,7 @@
 import type { DefinedElements, Degree, Point } from './types';
 import { BezierDegreeKeys, BezierPointRatios } from './bezier-points';
 import type { BezierCurve } from '../bezier-curve';
-import { CONFIG } from './config';
+import { ACTION, DURATION } from './config';
 
 const UnsafeElements = {
   $staticCanvas: document.querySelector<HTMLCanvasElement>('.static-canvas'),
@@ -60,7 +60,7 @@ export class UIController {
   public init() {
     const initialDegree = this.populateDegreePicker();
     this.updateDegreeLabel(initialDegree);
-    this.updateDurationValue(CONFIG.DURATION.DEFAULT);
+    this.updateDurationValue(DURATION.DEFAULT);
     this._updateDurationButtonStates();
     return this;
   }
@@ -81,7 +81,7 @@ export class UIController {
       const btn = (e.target as HTMLElement).closest('button');
       if (!btn) return;
       const action = btn.dataset.action;
-      if (action !== 'increase' && action !== 'decrease') return;
+      if (action !== ACTION.INCREASE && action !== ACTION.DECREASE) return;
 
       const newDuration = bezierCurve.changeDuration(action);
       this.updateDurationValue(newDuration);
@@ -92,9 +92,9 @@ export class UIController {
   private _updateDurationButtonStates() {
     const { $durationValue, $decreaseBtn, $increaseBtn } = this.elements;
 
-    const ms = parseInt($durationValue.dataset.value ?? `${CONFIG.DURATION.DEFAULT}`, 10);
-    $decreaseBtn.disabled = ms <= CONFIG.DURATION.MIN;
-    $increaseBtn.disabled = ms >= CONFIG.DURATION.MAX;
+    const ms = parseInt($durationValue.dataset.value ?? `${DURATION.DEFAULT}`, 10);
+    $decreaseBtn.disabled = ms <= DURATION.MIN;
+    $increaseBtn.disabled = ms >= DURATION.MAX;
   }
 }
 
