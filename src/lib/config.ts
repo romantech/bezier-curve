@@ -1,10 +1,12 @@
+import type { BezierCurveType } from './bezier-points';
+
 export const DURATION = {
   /** 기본 진행 시간(ms) */
-  DEFAULT: 4000,
+  DEFAULT: 3000,
   /** 최소 진행 시간(ms) */
   MIN: 1000,
   /** 최대 진행 시간(ms) */
-  MAX: 10000,
+  MAX: 15000,
   /** 증감 단위(ms) */
   STEP: 1000,
   /** 보간 단계 간격 (t 값 변화량) */
@@ -36,10 +38,13 @@ export const ACTION = {
   DECREASE: 'decrease',
 } as const;
 
+export const INITIAL_CURVE: BezierCurveType = 'cubic';
+
 export const CONFIG = {
   STYLE,
   DURATION,
   ACTION,
+  INITIAL_CURVE,
 } as const;
 
 export type Action = (typeof ACTION)[keyof typeof ACTION];
