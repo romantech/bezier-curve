@@ -41,7 +41,7 @@ export class UIController {
     curveTypes = BezierCurveTypes,
     initialCurve: BezierCurveType = INITIAL_CURVE,
   ) {
-    const initialKeyIdx = curveTypes.indexOf(initialCurve);
+    const initialKeyIdx = Math.max(0, curveTypes.indexOf(initialCurve));
 
     curveTypes.forEach((curve, i) => {
       const isSelected = i === initialKeyIdx;
