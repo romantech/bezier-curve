@@ -44,7 +44,7 @@ body {
   width: 76px;
 }
 
-:is(.toggle-button, .degree-picker, .duration > button) {
+:is(.toggle-button, .curve-picker, .duration > button) {
   text-transform: capitalize;
   background-color: #333;
   font-size: 15px;
@@ -56,11 +56,11 @@ body {
     border-color 0.3s;
 }
 
-:is(.toggle-button, .degree-picker, .duration > button):hover {
+:is(.toggle-button, .curve-picker, .duration > button):hover {
   background-color: #444;
 }
 
-:is(.toggle-button, .degree-picker, .duration > button):active {
+:is(.toggle-button, .curve-picker, .duration > button):active {
   opacity: 0.8;
 }
 
@@ -76,7 +76,7 @@ body {
   text-transform: capitalize;
 }
 
-.degree-picker {
+.curve-picker {
   -webkit-appearance: none;
   appearance: none;
 

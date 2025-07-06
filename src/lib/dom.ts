@@ -1,14 +1,14 @@
 import type { DefinedElements, Point } from './types';
-import { type BezierCurveKey, BezierCurveKeys, BezierPointRatios } from './bezier-points';
+import { type BezierCurveType, BezierCurveTypes, BezierPointRatios } from './bezier-points';
 import type { BezierCurve } from '../bezier-curve';
-import { ACTION, DURATION } from './config';
+import { ACTION, DURATION, INITIAL_CURVE } from './config';
 
 const UnsafeElements = {
   $staticCanvas: document.querySelector<HTMLCanvasElement>('.static-canvas'),
   $dynamicCanvas: document.querySelector<HTMLCanvasElement>('.dynamic-canvas'),
 
-  $degreeLabel: document.querySelector<HTMLElement>('.degree-label'),
-  $degreePicker: document.querySelector<HTMLSelectElement>('.degree-picker'),
+  $curveLabel: document.querySelector<HTMLElement>('.curve-label'),
+  $curvePicker: document.querySelector<HTMLSelectElement>('.curve-picker'),
 
   $tLabel: document.querySelector<HTMLSpanElement>('.t-value'),
 
@@ -33,19 +33,23 @@ export class UIController {
     this.elements = UnsafeElements as Elements;
   }
 
-  public updateDegreeLabel(label: string) {
-    this.elements.$degreeLabel.textContent = label;
+  public updateCurveLabel(label: string) {
+    this.elements.$curveLabel.textContent = label;
   }
 
-  public populateDegreePicker(degreeKeys = BezierCurveKeys) {
-    const initialKeyIdx = 0;
+  public populateCurvePicker(
+    curveTypes = BezierCurveTypes,
+    initialCurve: BezierCurveType = INITIAL_CURVE,
+  ) {
+    const initialKeyIdx = curveTypes.indexOf(initialCurve);
 
-    degreeKeys.forEach((key, i) => {
-      const option = new Option(key, key, i === initialKeyIdx);
-      this.elements.$degreePicker.appendChild(option);
+    curveTypes.forEach((curve, i) => {
+      const isSelected = i === initialKeyIdx;
+      const option = new Option(curve, curve, isSelected, isSelected);
+      this.elements.$curvePicker.add(option);
     });
 
-    return degreeKeys[initialKeyIdx];
+    return curveTypes[initialKeyIdx];
   }
 
   public updateTLabel(value: number) {
@@ -62,26 +66,26 @@ export class UIController {
   }
 
   public init() {
-    const initialDegree = this.populateDegreePicker();
-    this.updateDegreeLabel(initialDegree);
+    const initialCurve = this.populateCurvePicker();
+    this.updateCurveLabel(initialCurve);
     this.updateDurationValue(DURATION.DEFAULT);
     this._updateDurationButtonStates();
     return this;
   }
 
-  public bindEvents(bezierCurve: BezierCurve, mapPoints: (ratioPts: Point[]) => Point[]) {
-    const { $toggleBtn, $degreePicker, $duration } = this.elements;
+  public bindEvents(bezierCurve: BezierCurve, mapPoints: (ratioPoints: Point[]) => Point[]) {
+    const { $toggleBtn, $curvePicker, $duration } = this.elements;
 
     $toggleBtn.addEventListener('click', () => {
       bezierCurve.togglePlayPause();
       $toggleBtn.textContent = bezierCurve.nextActionLabel;
     });
 
-    $degreePicker.addEventListener('change', (e) => {
-      const selected = (e.target as HTMLSelectElement).value as BezierCurveKey;
-      const pts = mapPoints(BezierPointRatios[selected]);
-      this.updateDegreeLabel(selected);
-      bezierCurve.setPoints(pts).reset();
+    $curvePicker.addEventListener('change', (e) => {
+      const selected = (e.target as HTMLSelectElement).value as BezierCurveType;
+      const controlPoints = mapPoints(BezierPointRatios[selected]);
+      this.updateCurveLabel(selected);
+      bezierCurve.setPoints(controlPoints).reset();
     });
 
     $duration.addEventListener('click', (e) => {
