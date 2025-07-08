@@ -3,3 +3,4 @@ export * from './types';
 export * from './canvas';
 export * from './dom';
 export * from './config';
+export * from './events';

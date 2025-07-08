@@ -38,6 +38,11 @@ export const ACTION = {
   DECREASE: 'decrease',
 } as const;
 
+export const TOGGLE_LABEL = {
+  PAUSE: 'pause',
+  START: 'start',
+} as const;
+
 export const INITIAL_CURVE: BezierCurveType = 'cubic';
 
 export const CONFIG = {
@@ -45,6 +50,8 @@ export const CONFIG = {
   DURATION,
   ACTION,
   INITIAL_CURVE,
+  TOGGLE_LABEL,
 } as const;
 
 export type Action = (typeof ACTION)[keyof typeof ACTION];
+export type ToggleLabel = (typeof TOGGLE_LABEL)[keyof typeof TOGGLE_LABEL];

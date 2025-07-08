@@ -1,20 +1,20 @@
-import { ACTION, type Action, type BezierCurveOptions, DURATION, type Point, STYLE } from './lib';
+import {
+  ACTION,
+  type Action,
+  type BezierCurveOptions,
+  DURATION,
+  type Point,
+  Publisher,
+  STYLE,
+} from './lib';
 
-export class BezierCurve {
+export class BezierCurve extends Publisher {
   private points: Point[];
   /** 애니메이션 진행 시간 1000(ms) ~ 10000(ms) */
   private duration: number;
   private elapsedTime: number = 0;
   private animationFrameId: number | null = null;
 
-  /**
-   * t 값이 증가했을 때 수행할 액션.
-   * tick은 애니메이션 루프에서 한 번의 업데이트 사이클을 가리킴
-   * requestAnimationFrame과 함께쓰면 프레임 단위로 호출되므로 사실상 tick = 프레임
-   * */
-  private readonly onTick: BezierCurveOptions['onTick'];
-  /** 애니메이션이 중지(stop)됐을 때 수행할 액션 */
-  private readonly onStop: BezierCurveOptions['onStop'];
   private readonly staticCtx: CanvasRenderingContext2D;
   private readonly dynamicCtx: CanvasRenderingContext2D;
   private readonly width: number;
@@ -23,6 +23,7 @@ export class BezierCurve {
   private readonly finalPointColor: string;
 
   constructor(options: BezierCurveOptions) {
+    super();
     this.staticCtx = options.staticCtx;
     this.dynamicCtx = options.dynamicCtx;
 
@@ -33,12 +34,14 @@ export class BezierCurve {
 
     this.width = this.staticCtx.canvas.clientWidth;
     this.height = this.staticCtx.canvas.clientHeight;
-    this.onTick = options.onTick;
-    this.onStop = options.onStop;
   }
 
-  public get nextActionLabel() {
+  public get nextAction() {
     return this.animationFrameId ? 'pause' : 'start';
+  }
+
+  public get progress() {
+    return Math.min(this.elapsedTime / this.duration, 1);
   }
 
   /** 베지에 곡선 가이드, 초기 조절점/레이블 같은 정적 요소 렌더링 */
@@ -122,7 +125,7 @@ export class BezierCurve {
   }
 
   public togglePlayPause() {
-    const methodName = this.nextActionLabel;
+    const methodName = this.nextAction;
     this[methodName]();
   }
 
@@ -130,17 +133,19 @@ export class BezierCurve {
   public stop() {
     this._cancelAnimation();
     this.elapsedTime = 0;
-    this.onStop(this.nextActionLabel);
+    this.notify({ type: 'stop', progress: this.progress });
   }
 
   /** 애니메이션 일시정지. 다음 start() 호출 시 정지 시점부터 이어서 재생 */
   public pause() {
     this._cancelAnimation();
+    this.notify({ type: 'pause', progress: this.progress });
   }
 
   public start(): void {
     if (this.animationFrameId) return;
 
+    this.notify({ type: 'start', progress: this.progress });
     let startTime: number | null = null;
 
     /**
@@ -156,9 +161,9 @@ export class BezierCurve {
       if (!startTime) startTime = now - this.elapsedTime;
 
       this.elapsedTime = now - startTime;
-      const t = Math.min(this.elapsedTime / this.duration, 1);
+      const t = this.progress;
 
-      this.onTick(t);
+      this.notify({ type: 'tick', progress: t });
       this.drawDynamicLayer(t); // 매 프레임마다 동적 레이어 다시 렌더링
 
       if (t < 1) this.animationFrameId = requestAnimationFrame(animate);
@@ -168,11 +173,11 @@ export class BezierCurve {
     this.animationFrameId = requestAnimationFrame(animate);
   }
 
-  public reset() {
+  public setup() {
     this.stop();
     this.drawStaticLayer();
     this.drawDynamicLayer(0);
-    this.onTick(0);
+    this.notify({ type: 'setup', progress: this.progress });
   }
 
   public setPoints(newPoints: Point[]) {
