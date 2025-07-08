@@ -1,5 +1,3 @@
-import type { UIController } from './dom';
-
 export interface Point {
   x: number;
   y: number;
@@ -14,8 +12,6 @@ export interface BezierCurveOptions {
   duration?: number;
   pointColors?: string[];
   finalPointColor?: string;
-  onTick: UIController['updateTLabel'];
-  onStop: UIController['updateToggleLabel'];
 }
 
 export type DefinedElements<T> = {

@@ -20,16 +20,12 @@ function setupApp() {
     );
 
     const mapPoints = createPointMapper(cssWidth, cssHeight);
+    const points = mapPoints(BezierPointRatios.quadratic);
 
-    const bezierCurve = new BezierCurve({
-      staticCtx,
-      dynamicCtx,
-      points: mapPoints(BezierPointRatios.quadratic),
-      onTick: uiController.updateTLabel.bind(uiController),
-      onStop: uiController.updateToggleLabel.bind(uiController),
-    });
-
+    const bezierCurve = new BezierCurve({ staticCtx, dynamicCtx, points });
+    bezierCurve.subscribe(uiController);
     bezierCurve.reset();
+
     uiController.init().bindEvents(bezierCurve, mapPoints);
   } catch (e) {
     console.error('앱 초기화 실패:', e);

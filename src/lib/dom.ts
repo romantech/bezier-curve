@@ -1,7 +1,15 @@
 import type { DefinedElements, Point } from './types';
 import { type BezierCurveType, BezierCurveTypes, BezierPointRatios } from './bezier-points';
 import type { BezierCurve } from '../bezier-curve';
-import { ACTION, DURATION, INITIAL_CURVE } from './config';
+import {
+  type Action,
+  ACTION,
+  DURATION,
+  INITIAL_CURVE,
+  TOGGLE_LABEL,
+  type ToggleLabel,
+} from './config';
+import type { BezierEvent, Observer } from './events';
 
 const UnsafeElements = {
   $staticCanvas: document.querySelector<HTMLCanvasElement>('.static-canvas'),
@@ -22,7 +30,7 @@ const UnsafeElements = {
 
 type Elements = DefinedElements<typeof UnsafeElements>;
 
-export class UIController {
+export class UIController implements Observer {
   public readonly elements: Elements;
 
   constructor() {
@@ -52,12 +60,30 @@ export class UIController {
     return curveTypes[initialKeyIdx];
   }
 
-  public updateTLabel(value: number) {
-    this.elements.$tLabel.textContent = `${value.toFixed(2)}`;
+  public update(event: BezierEvent): void {
+    switch (event.type) {
+      case 'start':
+        this.updateToggleLabel(TOGGLE_LABEL.PAUSE);
+        break;
+      case 'tick':
+      case 'reset':
+        this.updateTLabel(event.progress);
+        break;
+      case 'stop':
+      case 'pause':
+        this.updateToggleLabel(TOGGLE_LABEL.START);
+        break;
+      default:
+        break;
+    }
   }
 
-  public updateToggleLabel(nextActionLabel: string) {
-    this.elements.$toggleBtn.textContent = nextActionLabel;
+  public updateTLabel(tValue: number) {
+    this.elements.$tLabel.textContent = `${tValue.toFixed(2)}`;
+  }
+
+  public updateToggleLabel(label: ToggleLabel) {
+    this.elements.$toggleBtn.textContent = label;
   }
 
   public updateDurationValue(duration: number) {
@@ -76,14 +102,12 @@ export class UIController {
   public bindEvents(bezierCurve: BezierCurve, mapPoints: (ratioPoints: Point[]) => Point[]) {
     const { $toggleBtn, $curvePicker, $duration } = this.elements;
 
-    $toggleBtn.addEventListener('click', () => {
-      bezierCurve.togglePlayPause();
-      $toggleBtn.textContent = bezierCurve.nextActionLabel;
-    });
+    $toggleBtn.addEventListener('click', bezierCurve.togglePlayPause.bind(bezierCurve));
 
     $curvePicker.addEventListener('change', (e) => {
       const selected = (e.target as HTMLSelectElement).value as BezierCurveType;
       const controlPoints = mapPoints(BezierPointRatios[selected]);
+
       this.updateCurveLabel(selected);
       bezierCurve.setPoints(controlPoints).reset();
     });
@@ -94,10 +118,14 @@ export class UIController {
       const action = btn.dataset.action;
       if (action !== ACTION.INCREASE && action !== ACTION.DECREASE) return;
 
-      const newDuration = bezierCurve.changeDuration(action);
-      this.updateDurationValue(newDuration);
-      this._updateDurationButtonStates();
+      this._handleDurationChange(bezierCurve, action);
     });
+  }
+
+  private _handleDurationChange(bezierCurve: BezierCurve, action: Action) {
+    const newDuration = bezierCurve.changeDuration(action);
+    this.updateDurationValue(newDuration);
+    this._updateDurationButtonStates();
   }
 
   private _updateDurationButtonStates() {
