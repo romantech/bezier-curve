@@ -66,7 +66,7 @@ export class UIController implements Observer {
         this.updateToggleLabel(TOGGLE_LABEL.PAUSE);
         break;
       case 'tick':
-      case 'reset':
+      case 'setup':
         this.updateTLabel(event.progress);
         break;
       case 'stop':
@@ -109,7 +109,7 @@ export class UIController implements Observer {
       const controlPoints = mapPoints(BezierPointRatios[selected]);
 
       this.updateCurveLabel(selected);
-      bezierCurve.setPoints(controlPoints).reset();
+      bezierCurve.setPoints(controlPoints).setup();
     });
 
     $duration.addEventListener('click', (e) => {

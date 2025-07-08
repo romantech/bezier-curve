@@ -173,11 +173,11 @@ export class BezierCurve extends Publisher {
     this.animationFrameId = requestAnimationFrame(animate);
   }
 
-  public reset() {
+  public setup() {
     this.stop();
     this.drawStaticLayer();
     this.drawDynamicLayer(0);
-    this.notify({ type: 'reset', progress: this.progress });
+    this.notify({ type: 'setup', progress: this.progress });
   }
 
   public setPoints(newPoints: Point[]) {

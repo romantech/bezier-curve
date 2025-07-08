@@ -1,4 +1,4 @@
-export type BezierEventType = 'start' | 'stop' | 'pause' | 'reset' | 'tick';
+export type BezierEventType = 'start' | 'stop' | 'pause' | 'setup' | 'tick';
 
 export type BezierEvent = {
   type: BezierEventType;

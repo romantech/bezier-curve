@@ -24,7 +24,7 @@ function setupApp() {
 
     const bezierCurve = new BezierCurve({ staticCtx, dynamicCtx, points });
     bezierCurve.subscribe(uiController);
-    bezierCurve.reset();
+    bezierCurve.setup();
 
     uiController.init().bindEvents(bezierCurve, mapPoints);
   } catch (e) {
