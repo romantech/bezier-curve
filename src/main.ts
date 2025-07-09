@@ -1,3 +1,4 @@
+import { BezierCurve } from './bezier-curve';
 import {
   BezierPointRatios,
   createPointMapper,
@@ -5,7 +6,6 @@ import {
   setupCanvasResolution,
   uiController,
 } from './lib';
-import { BezierCurve } from './bezier-curve';
 
 function setupApp() {
   const { $staticCanvas, $dynamicCanvas } = uiController.elements;
