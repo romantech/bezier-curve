@@ -1,15 +1,15 @@
-import type { DefinedElements, Point } from './types';
-import { type BezierCurveType, BezierCurveTypes, BezierPointRatios } from './bezier-points';
 import type { BezierCurve } from '../bezier-curve';
+import { type BezierCurveType, BezierCurveTypes, BezierPointRatios } from './bezier-points';
 import {
-  type Action,
   ACTION,
+  type Action,
   DURATION,
   INITIAL_CURVE,
   TOGGLE_LABEL,
   type ToggleLabel,
 } from './config';
 import type { BezierEvent, Observer } from './events';
+import type { DefinedElements, Point } from './types';
 
 const UnsafeElements = {
   $staticCanvas: document.querySelector<HTMLCanvasElement>('.static-canvas'),
