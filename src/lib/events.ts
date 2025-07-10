@@ -12,15 +12,18 @@ export interface Observer {
 export class Publisher {
   private observers: Set<Observer> = new Set();
 
-  public subscribe(observer: Observer): void {
+  public subscribe(observer: Observer) {
     this.observers.add(observer);
+    return this;
   }
 
-  public unsubscribe(observer: Observer): void {
+  public unsubscribe(observer: Observer) {
     this.observers.delete(observer);
+    return this;
   }
 
-  public notify(event: BezierEvent): void {
+  public notify(event: BezierEvent) {
     this.observers.forEach((observer) => observer.update(event));
+    return this;
   }
 }
