@@ -10,10 +10,11 @@ import {
 
 export class BezierCurve extends Publisher {
   private points: Point[];
-  /** 애니메이션 진행 시간 1000(ms) ~ 10000(ms) */
+  /** 애니메이션 진행 시간 */
   private duration: number;
   private elapsedTime: number = 0;
   private animationFrameId: number | null = null;
+  private grabbedPointIndex: number | null = null;
 
   private readonly staticCtx: CanvasRenderingContext2D;
   private readonly dynamicCtx: CanvasRenderingContext2D;
@@ -34,6 +35,8 @@ export class BezierCurve extends Publisher {
 
     this.width = this.staticCtx.canvas.clientWidth;
     this.height = this.staticCtx.canvas.clientHeight;
+
+    this._addEventListeners();
   }
 
   public get nextAction() {
@@ -44,17 +47,21 @@ export class BezierCurve extends Publisher {
     return Math.min(this.elapsedTime / this.duration, 1);
   }
 
+  private get _gridSize() {
+    return this.width / STYLE.GRID_DIVISIONS;
+  }
+
   /** 베지에 곡선 가이드, 초기 조절점/레이블 같은 정적 요소 렌더링 */
   public drawStaticLayer(): void {
     const ctx = this.staticCtx;
     this._clearLayer(ctx); // 베지에 곡선 차수(degree) 변경 시 가이드를 다시 그려야하므로 캔버스 초기화
 
-    const gridSize = this.width / STYLE.GRID_DIVISIONS;
+    const { _gridSize } = this;
     // 좌상단, 우하단 경계는 제외하고 내부 영역에만 격자 추가
-    for (let x = gridSize; x < this.width; x += gridSize) {
+    for (let x = _gridSize; x < this.width; x += _gridSize) {
       this._drawLine(ctx, { x, y: 0 }, { x, y: this.height }, STYLE.GRID_COLOR); // 세로선(상 > 하 라인 생선)
     }
-    for (let y = gridSize; y < this.height; y += gridSize) {
+    for (let y = _gridSize; y < this.height; y += _gridSize) {
       this._drawLine(ctx, { x: 0, y }, { x: this.width, y }, STYLE.GRID_COLOR); // 가로선(좌 > 우 라인 생성)
     }
 
@@ -105,7 +112,7 @@ export class BezierCurve extends Publisher {
         const [p1, p2] = [currentPoints[i], currentPoints[i + 1]];
         const interpolatedPoint = this._getInterpolatedPoint(p1, p2, t);
         nextPoints.push(interpolatedPoint);
-        this._drawPoint(ctx, interpolatedPoint, color, STYLE.CTRL_POINT_SIZE);
+        this._drawPoint(ctx, interpolatedPoint, color, STYLE.CTRL_POINT_RADIUS);
       }
 
       // 계산한 보간점 사이를 직선으로 연결
@@ -120,7 +127,7 @@ export class BezierCurve extends Publisher {
 
     // 모든 보간이 끝나고 마지막 남은 점(베지에 곡선 위의 점) 표시
     const finalPoint = currentPoints[0];
-    this._drawPoint(ctx, finalPoint, this.finalPointColor, STYLE.CTRL_POINT_SIZE);
+    this._drawPoint(ctx, finalPoint, this.finalPointColor, STYLE.CTRL_POINT_RADIUS);
     this._drawLabel(ctx, finalPoint, 'P', -20, 20);
   }
 
@@ -177,7 +184,7 @@ export class BezierCurve extends Publisher {
     this.stop();
     this.drawStaticLayer();
     this.drawDynamicLayer(0);
-    this.notify({ type: 'setup', progress: this.progress });
+    this.notify({ type: 'stop', progress: this.progress });
   }
 
   public setPoints(newPoints: Point[]) {
@@ -191,6 +198,80 @@ export class BezierCurve extends Publisher {
     return this.duration;
   }
 
+  private _addEventListeners(): void {
+    const canvas = this.dynamicCtx.canvas;
+    // 모바일에선 터치를 스크롤, 줌 같은 제스처로 처리하므로 캔버스를 드래그 가능한 영역으로 전환하기 위해 touchAction 비활성
+    canvas.style.touchAction = 'none';
+
+    canvas.addEventListener('pointerdown', this._onPointerDown.bind(this));
+    canvas.addEventListener('pointermove', this._onPointerMove.bind(this));
+    canvas.addEventListener('pointerup', this._onPointerUp.bind(this));
+    canvas.addEventListener('pointerleave', this._onPointerUp.bind(this));
+  }
+
+  private _onPointerDown(e: PointerEvent): void {
+    if (this.animationFrameId) return; // 애니메이션 재생 중에는 드래그 비활성화
+
+    const mousePos = this._getPointerPos(e);
+    const pointIdx = this.points.findIndex((p) => this._isColliding(p, mousePos));
+
+    if (pointIdx !== -1) {
+      this._changeCursor('grabbing');
+      this.grabbedPointIndex = pointIdx;
+    }
+  }
+
+  private _changeCursor(cursor: 'default' | 'grabbing' | 'grab') {
+    this.dynamicCtx.canvas.style.cursor = cursor;
+  }
+
+  private _onPointerMove(e: PointerEvent): void {
+    if (this.animationFrameId) return;
+
+    const mousePos = this._getPointerPos(e);
+
+    if (this.grabbedPointIndex !== null) {
+      // 드래그 중일 때: 조절점 위치 업데이트
+      this.points[this.grabbedPointIndex] = this._clampPoint(mousePos);
+      this.setup();
+    } else {
+      // 드래그 중이 아닐 때: 커서 아이콘 변경
+      const isOverPoint = this.points.some((p) => this._isColliding(p, mousePos));
+      this._changeCursor(isOverPoint ? 'grab' : 'default');
+    }
+  }
+
+  private _onPointerUp(): void {
+    if (this.animationFrameId) return;
+
+    // 조절점을 드래그한 후 마우스를 놓았다면 'grab', 빈 공간을 클릭했다 놓았다면 'default' 커서
+    this._changeCursor(this.grabbedPointIndex ? 'grab' : 'default');
+    this.grabbedPointIndex = null;
+  }
+
+  private _getPointerPos(e: PointerEvent): Point {
+    const rect = this.dynamicCtx.canvas.getBoundingClientRect();
+    return {
+      // e.clientX: 화면 왼쪽 최상단부터 이벤트가 발생한 지점까지의 거리
+      // rect.left: 화면 좌측부터 해당 엘리먼트의 왼쪽 변까지의 거리
+      // e.clientX - rect.left: 해당 엘리먼트의 왼쪽부터 이벤트가 발생한 지점까지의 거리
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    };
+  }
+
+  private _isColliding(point: Point, mouse: Point): boolean {
+    /**
+     * 피타고라스 정리를 이용해 point, mouse 사이의 직선 거리(빗변) 계산
+     * @see https://webp.romantech.net/distance_between_points.png 참고 이미지
+     * */
+    const dx = point.x - mouse.x;
+    const dy = point.y - mouse.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    // 조절점보다 큰 영역으로 지정해서 포인트 선택하기 편하게 설정
+    return distance < STYLE.BASE_POINT_RADIUS * 2;
+  }
+
   private _cancelAnimation(): void {
     if (!this.animationFrameId) return;
 
@@ -198,8 +279,22 @@ export class BezierCurve extends Publisher {
     this.animationFrameId = null;
   }
 
+  /** Point 좌표를 1개 그리드 사이즈 안으로 제한(가장 바깥쪽 그리드는 경계선이 없으므로) */
+  private _clampPoint(point: Point): Point {
+    const padding = this._gridSize;
+    const x = this._clamp(point.x, padding, this.width - padding);
+    const y = this._clamp(point.y, padding, this.height - padding);
+    return { x, y };
+  }
+
+  /** 애니메이션 진행시간 DURATION.MIN ~ DURATION.MAX 사이로 제한 */
   private _clampDuration(value: number): number {
-    return Math.min(DURATION.MAX, Math.max(DURATION.MIN, value));
+    return this._clamp(value, DURATION.MIN, DURATION.MAX);
+  }
+
+  private _clamp(value: number, min: number, max: number) {
+    // value를 먼저 최대값 이하로 제한한 후(Math.min), 최소값 이상으로 제한(Math.max)
+    return Math.max(min, Math.min(value, max));
   }
 
   /**
@@ -266,11 +361,12 @@ export class BezierCurve extends Publisher {
     ctx: CanvasRenderingContext2D,
     point: Point,
     color: string,
-    size: number = STYLE.BASE_POINT_SIZE,
+    radius: number = STYLE.BASE_POINT_RADIUS,
   ): void {
     ctx.beginPath();
     // arc(x, y, radius, startAngle, endAngle, anticlockwise)
-    ctx.arc(point.x, point.y, size, 0, 2 * Math.PI);
+    // 종료 각도를 나타내는 endAngle 인자는 라디언 단위이며 2 * Math.PI는 360도가 됨
+    ctx.arc(point.x, point.y, radius, 0, 2 * Math.PI);
     ctx.fillStyle = color;
     ctx.fill();
   }
