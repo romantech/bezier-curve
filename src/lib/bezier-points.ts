@@ -61,6 +61,7 @@ export const BezierPointRatios = {
 export type BezierCurveType = keyof typeof BezierPointRatios;
 export const BezierCurveTypes = Object.keys(BezierPointRatios) as readonly BezierCurveType[];
 
+export type MapPoints = ReturnType<typeof createPointMapper>;
 export const createPointMapper = (width: number, height: number) => {
   return (ratioPoints: Point[]) =>
     ratioPoints.map((point) => ({

@@ -2,6 +2,7 @@ import { BezierCurve } from './bezier-curve';
 import {
   BezierPointRatios,
   createPointMapper,
+  INITIAL_CURVE,
   setupCanvasCtx,
   setupCanvasResolution,
   uiController,
@@ -20,13 +21,13 @@ function setupApp() {
     );
 
     const mapPoints = createPointMapper(cssWidth, cssHeight);
-    const points = mapPoints(BezierPointRatios.quadratic);
+    const points = mapPoints(BezierPointRatios[INITIAL_CURVE]);
 
     const bezierCurve = new BezierCurve({ staticCtx, dynamicCtx, points });
     bezierCurve.subscribe(uiController);
     bezierCurve.setup();
 
-    uiController.init().bindEvents(bezierCurve, mapPoints);
+    uiController.init(bezierCurve, mapPoints);
   } catch (e) {
     console.error('앱 초기화 실패:', e);
     document.body.innerHTML = '<div class="error">앱을 초기화할 수 없습니다.</div>';
