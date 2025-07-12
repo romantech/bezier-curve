@@ -184,7 +184,7 @@ export class BezierCurve extends Publisher {
     this.stop();
     this.drawStaticLayer();
     this.drawDynamicLayer(0);
-    this.notify({ type: 'stop', progress: this.progress });
+    this.notify({ type: 'setup', progress: this.progress });
   }
 
   public setPoints(newPoints: Point[]) {
