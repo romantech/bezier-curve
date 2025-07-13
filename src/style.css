@@ -1,3 +1,5 @@
+@import "driver.js/dist/driver.css";
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   color-scheme: light dark;
@@ -138,4 +140,14 @@ body {
 .duration > button:disabled {
   opacity: 0.5;
   pointer-events: none;
+}
+
+.ctrl-popover {
+  translate: 0 40px;
+}
+
+@media (hover: none) {
+  .ctrl-popover {
+    translate: 0 25px;
+  }
 }
