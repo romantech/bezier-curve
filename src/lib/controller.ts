@@ -149,4 +149,4 @@ export class Controller implements Observer {
 }
 
 /** 싱글턴(단일 인스턴스)으로 사용 */
-export const uiController = new Controller();
+export const controller = new Controller();

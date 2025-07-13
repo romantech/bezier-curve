@@ -1,15 +1,16 @@
 import { BezierCurve } from '@/core';
 import {
   BezierPointRatios,
+  controller,
   createPointMapper,
   INITIAL_CURVE,
   setupCanvasCtx,
   setupCanvasResolution,
-  uiController,
+  startOnboarding,
 } from '@/lib';
 
 function setupApp() {
-  const { $staticCanvas, $dynamicCanvas } = uiController.elements;
+  const { $staticCanvas, $dynamicCanvas } = controller.elements;
   try {
     const { staticCtx, dynamicCtx } = setupCanvasCtx($staticCanvas, $dynamicCanvas);
 
@@ -24,9 +25,10 @@ function setupApp() {
     const points = mapPoints(BezierPointRatios[INITIAL_CURVE]);
 
     const bezierCurve = new BezierCurve({ staticCtx, dynamicCtx, points });
-    bezierCurve.subscribe(uiController).setup();
+    bezierCurve.subscribe(controller).setup();
 
-    uiController.init(bezierCurve, mapPoints);
+    controller.init(bezierCurve, mapPoints);
+    startOnboarding();
   } catch (e) {
     console.error('앱 초기화 실패:', e);
     document.body.innerHTML = '<div class="error">앱을 초기화할 수 없습니다.</div>';

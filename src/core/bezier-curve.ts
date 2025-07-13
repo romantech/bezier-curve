@@ -1,4 +1,4 @@
-import { ACTION, type Action, CanvasRenderer, DURATION, STYLE } from '../lib';
+import { ACTION, type Action, CanvasRenderer, DURATION, STYLE } from '@/lib';
 import { clamp } from './lerp';
 import { Publisher } from './observer';
 

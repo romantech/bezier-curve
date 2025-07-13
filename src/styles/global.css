@@ -1,4 +1,18 @@
+@import "./driver-custom.css";
+
 :root {
+  /* Color Palette */
+  --bg-main: #131417;
+  --text-light: white;
+  --text-dark: #131417;
+  --accent: #f9de60;
+  --button-bg: #333;
+  --button-hover: #444;
+  --input-bg: #222;
+  --border-light: #444;
+  --border-dark: #2f2f2f;
+
+  /* Base Styles */
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   color-scheme: light dark;
   font-synthesis: none;
@@ -9,8 +23,8 @@
 
 body {
   margin: 0;
-  background-color: #131417;
-  color: white;
+  background-color: var(--bg-main);
+  color: var(--text-light);
   height: 100vh;
 }
 
@@ -46,18 +60,18 @@ body {
 
 :is(.toggle-button, .curve-picker, .duration > button) {
   text-transform: capitalize;
-  background-color: #333;
+  background-color: var(--button-bg);
   font-size: 15px;
   border-radius: 5px;
   cursor: pointer;
-  color: white;
+  color: var(--text-light);
   transition:
     background-color 0.3s,
     border-color 0.3s;
 }
 
 :is(.toggle-button, .curve-picker, .duration > button):hover {
-  background-color: #444;
+  background-color: var(--button-hover);
 }
 
 :is(.toggle-button, .curve-picker, .duration > button):active {
@@ -80,9 +94,9 @@ body {
   -webkit-appearance: none;
   appearance: none;
 
-  background-color: #222;
+  background-color: var(--input-bg);
   padding: 10px 35px 10px 15px; /* 오른쪽은 화살표 공간 확보 */
-  border: 1px solid #444; /* 은은한 테두리 */
+  border: 1px solid var(--border-light); /* 은은한 테두리 */
 
   /* 커스텀 드롭다운 화살표 (SVG 인코딩) */
   background-image: url("/public/chevron-down.svg");
@@ -93,7 +107,7 @@ body {
 
 .t-display {
   font-weight: 600;
-  color: #f9de60;
+  color: var(--accent);
   font-style: italic;
 }
 
@@ -116,7 +130,7 @@ body {
 }
 
 .duration-display {
-  border: 1px solid #2f2f2f;
+  border: 1px solid var(--border-dark);
   padding: 8px 0;
   border-radius: 5px;
   user-select: none;
