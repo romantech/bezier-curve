@@ -3,13 +3,15 @@ import { controller } from './controller';
 
 export const onboard = driver({
   showProgress: true,
+  animate: false,
+  overlayColor: 'transparent',
   steps: [
     {
       element: controller.elements.$dynamicCanvas,
       popover: {
-        title: 'Move control points',
-        description: 'Drag and drop to move the control points.',
-        popoverClass: 'ctrl-popover',
+        title: 'Move the Control Points',
+        description: 'Click and drag the control points to change the curve.',
+        popoverClass: 'control-point-popover',
         side: 'top',
         align: 'center',
       },
@@ -17,8 +19,8 @@ export const onboard = driver({
     {
       element: controller.elements.$toggleBtn,
       popover: {
-        title: 'Pause/Resume',
-        description: 'Press the button to pause or resume the animation.',
+        title: 'Pause or Resume',
+        description: 'Click the button to pause or resume the animation.',
         side: 'top',
         align: 'start',
       },
@@ -26,18 +28,18 @@ export const onboard = driver({
     {
       element: controller.elements.$curvePicker,
       popover: {
-        title: 'Change curves',
-        description: 'Choose a Bézier curve from 1st to 5th order.',
+        title: 'Change Curve Type',
+        description: 'Choose a Bézier curve, from linear (1st order) to quintic (5th order).',
         side: 'top',
-        align: 'center',
+        align: 'start',
       },
     },
     {
       element: controller.elements.$duration,
       popover: {
-        title: 'Duration control',
+        title: 'Adjust Duration',
         description:
-          'Adjust the duration using the - and + buttons. A shorter duration makes the animation play faster.',
+          'Use the - and + buttons to adjust the animation speed. A shorter duration results in a faster animation.',
         side: 'top',
         align: 'end',
       },

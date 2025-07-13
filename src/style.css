@@ -142,12 +142,57 @@ body {
   pointer-events: none;
 }
 
-.ctrl-popover {
+.control-point-popover {
   translate: 0 40px;
 }
 
 @media (hover: none) {
-  .ctrl-popover {
+  .control-point-popover {
     translate: 0 25px;
   }
+  .driver-popover {
+    max-width: 250px;
+  }
+}
+
+.driver-popover {
+  background-color: #f9de60;
+  color: #131417;
+}
+
+.driver-popover-arrow-side-left {
+  border-left-color: #f9de60;
+}
+
+.driver-popover-arrow-side-right {
+  border-right-color: #f9de60;
+}
+
+.driver-popover-arrow-side-top {
+  border-top-color: #f9de60;
+}
+
+.driver-popover-arrow-side-bottom {
+  border-bottom-color: #f9de60;
+}
+
+.driver-popover-close-btn {
+  color: #131417;
+}
+
+.driver-popover-footer button {
+  padding: 6px 8px;
+  background-color: #131417;
+  color: white;
+  text-shadow: none;
+  border: none;
+}
+
+.driver-popover-footer button:hover {
+  opacity: 0.9;
+  background-color: #131417;
+}
+
+.driver-popover-progress-text {
+  color: #131417;
 }
