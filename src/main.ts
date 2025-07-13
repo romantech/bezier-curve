@@ -4,9 +4,9 @@ import {
   controller,
   createPointMapper,
   INITIAL_CURVE,
-  onboard,
   setupCanvasCtx,
   setupCanvasResolution,
+  startOnboarding,
 } from '@/lib';
 
 function setupApp() {
@@ -28,7 +28,7 @@ function setupApp() {
     bezierCurve.subscribe(controller).setup();
 
     controller.init(bezierCurve, mapPoints);
-    onboard.drive();
+    startOnboarding();
   } catch (e) {
     console.error('앱 초기화 실패:', e);
     document.body.innerHTML = '<div class="error">앱을 초기화할 수 없습니다.</div>';

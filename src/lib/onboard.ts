@@ -1,10 +1,10 @@
 import { driver } from 'driver.js';
 import { controller } from './controller';
 
-export const onboard = driver({
+const onboard = driver({
   showProgress: true,
-  animate: false,
-  overlayColor: 'transparent',
+  overlayOpacity: 0.5,
+  onDestroyed: () => localStorage.setItem('bezier-curve-onboarded', 'true'),
   steps: [
     {
       element: controller.elements.$dynamicCanvas,
@@ -46,3 +46,8 @@ export const onboard = driver({
     },
   ],
 });
+
+export const startOnboarding = () => {
+  const hasSeenOnboarding = localStorage.getItem('bezier-curve-onboarded');
+  if (!hasSeenOnboarding) onboard.drive();
+};
