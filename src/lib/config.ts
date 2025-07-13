@@ -1,4 +1,4 @@
-import type { BezierCurveType } from './bezier-points';
+import type { BezierCurveType } from './presets';
 
 export const DURATION = {
   /** 기본 진행 시간(ms) */

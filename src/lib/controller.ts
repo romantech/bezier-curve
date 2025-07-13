@@ -13,7 +13,7 @@ import {
   TOGGLE_LABEL,
   type ToggleLabel,
 } from './config';
-import type { BezierEvent, Observer } from './events';
+import type { BezierEvent, Observer } from './observer';
 import type { DefinedElements } from './types';
 
 const UnsafeElements = {
@@ -35,7 +35,7 @@ const UnsafeElements = {
 
 type Elements = DefinedElements<typeof UnsafeElements>;
 
-export class UIController implements Observer {
+export class Controller implements Observer {
   public readonly elements: Elements;
 
   constructor() {
@@ -147,4 +147,4 @@ export class UIController implements Observer {
 }
 
 /** 싱글턴(단일 인스턴스)으로 사용 */
-export const uiController = new UIController();
+export const uiController = new Controller();

@@ -2,13 +2,13 @@ import {
   ACTION,
   type Action,
   type BezierCurveOptions,
+  CanvasRenderer,
   clamp,
   DURATION,
   type Point,
   Publisher,
   STYLE,
 } from './lib';
-import { CanvasRenderer } from './renderer';
 
 export class BezierCurve extends Publisher {
   private points: Point[];

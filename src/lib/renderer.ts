@@ -1,4 +1,4 @@
-import { DURATION, getBezierPoint, getInterpolatedPoint, type Point, STYLE } from './lib';
+import { DURATION, getBezierPoint, getInterpolatedPoint, type Point, STYLE } from './index.ts';
 
 export class CanvasRenderer {
   private readonly staticCtx: CanvasRenderingContext2D;
