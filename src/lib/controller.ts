@@ -1,4 +1,4 @@
-import type { BezierCurve, BezierEvent, Observer } from '../core';
+import type { BezierCurve, BezierEvent, Observer } from '@/core';
 import {
   ACTION,
   type Action,

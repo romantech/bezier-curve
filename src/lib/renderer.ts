@@ -1,4 +1,4 @@
-import { getBezierPoint, getInterpolatedPoint, type Point } from '../core';
+import { getBezierPoint, getInterpolatedPoint, type Point } from '@/core';
 import { DURATION, STYLE } from './config';
 
 export class CanvasRenderer {
