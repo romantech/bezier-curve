@@ -1,11 +1,5 @@
 import type { BezierCurve } from '../bezier-curve';
 import {
-  type BezierCurveType,
-  BezierCurveTypes,
-  BezierPointRatios,
-  type MapPoints,
-} from './bezier-points';
-import {
   ACTION,
   type Action,
   DURATION,
@@ -14,6 +8,12 @@ import {
   type ToggleLabel,
 } from './config';
 import type { BezierEvent, Observer } from './observer';
+import {
+  type BezierCurveType,
+  BezierCurveTypes,
+  BezierPointRatios,
+  type MapPoints,
+} from './presets';
 import type { DefinedElements } from './types';
 
 const UnsafeElements = {
