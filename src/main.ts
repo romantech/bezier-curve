@@ -28,7 +28,6 @@ function setupApp() {
     bezierCurve.subscribe(controller).setup();
 
     controller.init(bezierCurve, mapPoints);
-
     onboard.drive();
   } catch (e) {
     console.error('앱 초기화 실패:', e);
