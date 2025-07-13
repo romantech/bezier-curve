@@ -1,4 +1,4 @@
-import type { Point, PointList } from './types';
+import type { Point, PointList } from '../core';
 
 export const BezierPointRatios = {
   /** 1차 베지에 곡선 비율 (직선) */

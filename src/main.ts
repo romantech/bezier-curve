@@ -1,4 +1,4 @@
-import { BezierCurve } from './bezier-curve';
+import { BezierCurve } from './core';
 import {
   BezierPointRatios,
   createPointMapper,

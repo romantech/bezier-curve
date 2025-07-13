@@ -1,4 +1,4 @@
-import type { BezierCurve } from '../bezier-curve';
+import type { BezierCurve, BezierEvent, Observer } from '../core';
 import {
   ACTION,
   type Action,
@@ -7,14 +7,16 @@ import {
   TOGGLE_LABEL,
   type ToggleLabel,
 } from './config';
-import type { BezierEvent, Observer } from './observer';
 import {
   type BezierCurveType,
   BezierCurveTypes,
   BezierPointRatios,
   type MapPoints,
 } from './presets';
-import type { DefinedElements } from './types';
+
+export type DefinedElements<T> = {
+  [K in keyof T]: NonNullable<T[K]>;
+};
 
 const UnsafeElements = {
   $staticCanvas: document.querySelector<HTMLCanvasElement>('.static-canvas'),

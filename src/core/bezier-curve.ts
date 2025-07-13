@@ -1,14 +1,22 @@
-import {
-  ACTION,
-  type Action,
-  type BezierCurveOptions,
-  CanvasRenderer,
-  clamp,
-  DURATION,
-  type Point,
-  Publisher,
-  STYLE,
-} from './lib';
+import { ACTION, type Action, CanvasRenderer, DURATION, STYLE } from '../lib';
+import { clamp } from './lerp';
+import { Publisher } from './observer';
+
+export interface Point {
+  x: number;
+  y: number;
+}
+
+export type PointList = Point[];
+
+export interface BezierCurveOptions {
+  staticCtx: CanvasRenderingContext2D;
+  dynamicCtx: CanvasRenderingContext2D;
+  points: Point[];
+  duration?: number;
+  pointColors?: string[];
+  finalPointColor?: string;
+}
 
 export class BezierCurve extends Publisher {
   private points: Point[];

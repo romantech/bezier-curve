@@ -1,4 +1,4 @@
-import type { Point } from './types';
+import type { Point } from './bezier-curve';
 
 /**
  * 선형보간 계산식: (1 - t)P₁ + tP₂
