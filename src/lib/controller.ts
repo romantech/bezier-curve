@@ -1,10 +1,4 @@
-import type { BezierCurve } from '../bezier-curve';
-import {
-  type BezierCurveType,
-  BezierCurveTypes,
-  BezierPointRatios,
-  type MapPoints,
-} from './bezier-points';
+import type { BezierCurve, BezierEvent, Observer } from '@/core';
 import {
   ACTION,
   type Action,
@@ -13,8 +7,16 @@ import {
   TOGGLE_LABEL,
   type ToggleLabel,
 } from './config';
-import type { BezierEvent, Observer } from './events';
-import type { DefinedElements } from './types';
+import {
+  type BezierCurveType,
+  BezierCurveTypes,
+  BezierPointRatios,
+  type MapPoints,
+} from './presets';
+
+export type DefinedElements<T> = {
+  [K in keyof T]: NonNullable<T[K]>;
+};
 
 const UnsafeElements = {
   $staticCanvas: document.querySelector<HTMLCanvasElement>('.static-canvas'),
@@ -35,7 +37,7 @@ const UnsafeElements = {
 
 type Elements = DefinedElements<typeof UnsafeElements>;
 
-export class UIController implements Observer {
+export class Controller implements Observer {
   public readonly elements: Elements;
 
   constructor() {
@@ -147,4 +149,4 @@ export class UIController implements Observer {
 }
 
 /** 싱글턴(단일 인스턴스)으로 사용 */
-export const uiController = new UIController();
+export const uiController = new Controller();
