@@ -1,10 +1,12 @@
 import { driver } from 'driver.js';
 import { controller } from './controller';
 
+const ONBOARDING_STORAGE_KEY = 'bezier-curve-onboarded';
+
 const onboard = driver({
   showProgress: true,
   overlayOpacity: 0.5,
-  onDestroyed: () => localStorage.setItem('bezier-curve-onboarded', 'true'),
+  onDestroyed: () => localStorage.setItem(ONBOARDING_STORAGE_KEY, 'true'),
   steps: [
     {
       element: controller.elements.$dynamicCanvas,
@@ -48,6 +50,14 @@ const onboard = driver({
 });
 
 export const startOnboarding = () => {
-  const hasSeenOnboarding = localStorage.getItem('bezier-curve-onboarded');
+  /**
+   * <iframe> 태그에서 렌더링 중일 땐 온보딩 표시 안함
+   * window.self: 현재 코드가 실행 중인 창의 window 객체. iframe 내부에서는 해당 iframe의 window를 가리킴.
+   * window.top:  iframe 중첩 여부와 관계없이 가장 최상위 부모 창(브라우저 창)의 window 객체.
+   */
+  const isInFrame = window.self !== window.top;
+  if (isInFrame) return;
+
+  const hasSeenOnboarding = localStorage.getItem(ONBOARDING_STORAGE_KEY);
   if (!hasSeenOnboarding) onboard.drive();
 };
