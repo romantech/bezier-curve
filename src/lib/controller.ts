@@ -1,4 +1,5 @@
 import type { BezierCurve, BezierEvent, Observer } from '@/core';
+import { startOnboarding } from '@/lib/onboard.ts';
 import {
   ACTION,
   type Action,
@@ -31,6 +32,7 @@ const UnsafeElements = {
   $durationValue: document.querySelector<HTMLSpanElement>('.duration-value'),
 
   $toggleBtn: document.querySelector<HTMLButtonElement>('.toggle-button'),
+  $onboardBtn: document.querySelector<HTMLButtonElement>('.onboard-button'),
   $decreaseBtn: document.querySelector<HTMLButtonElement>('button[data-action="decrease"]'),
   $increaseBtn: document.querySelector<HTMLButtonElement>('button[data-action="increase"]'),
 };
@@ -106,9 +108,10 @@ export class Controller implements Observer {
   }
 
   private _bindEvents(bezierCurve: BezierCurve, mapPoints: MapPoints) {
-    const { $toggleBtn, $curvePicker, $duration } = this.elements;
+    const { $toggleBtn, $curvePicker, $duration, $onboardBtn } = this.elements;
 
     $toggleBtn.addEventListener('click', bezierCurve.togglePlayPause.bind(bezierCurve));
+    $onboardBtn.addEventListener('click', () => startOnboarding(true));
 
     $curvePicker.addEventListener('change', (e) => {
       const selected = (e.target as HTMLSelectElement).value as BezierCurveType;
