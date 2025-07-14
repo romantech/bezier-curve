@@ -128,6 +128,14 @@ export class BezierCurve extends Publisher {
     return this;
   }
 
+  /**
+   * this.duration 조정 메서드
+   * duration 길어질수록 t 증가 폭 줄어듦 -> 애니메이션 더 느리게 진행
+   *
+   * [예시] 각 프레임에서 t가 증가하는 폭(Δt) 비교 (프레임 간격: 16ms 가정)
+   * - duration 1000ms일 때: Δt ≈ 16 / 1000 = 0.016
+   * - duration 10000ms일 때: Δt ≈ 16 / 10000 = 0.0016
+   */
   public changeDuration(action: Action) {
     const delta = action === ACTION.INCREASE ? DURATION.STEP : -DURATION.STEP;
     this.duration = this._clampDuration(delta + this.duration);
