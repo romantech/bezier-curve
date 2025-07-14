@@ -1,5 +1,4 @@
 import type { BezierCurve, BezierEvent, Observer } from '@/core';
-import { startOnboarding } from '@/lib/onboard.ts';
 import {
   ACTION,
   type Action,
@@ -8,6 +7,7 @@ import {
   TOGGLE_LABEL,
   type ToggleLabel,
 } from './config';
+import { startOnboarding } from './onboard';
 import {
   type BezierCurveType,
   BezierCurveTypes,
