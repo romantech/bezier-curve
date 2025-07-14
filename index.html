@@ -9,15 +9,21 @@
   </head>
   <body>
     <main id="app">
-      <a
-        class="github-link"
-        href="https://github.com/romantech/bezier-curve"
-        rel="noopener"
-        target="_blank"
-      >
-        <!-- public 폴더의 파일들은 빌드 시 루트로 복사되어 /public/ 경로 없이 접근 가능 -->
-        <img alt="Go to the GitHub repository" src="/github-mark-white.svg" />
-      </a>
+      <header class="main-header">
+        <button class="onboard-button" type="button">
+          <img alt="Start onboarding" src="/circle-question-mark.svg" />
+        </button>
+        <a
+          class="github-link"
+          href="https://github.com/romantech/bezier-curve"
+          rel="noopener"
+          target="_blank"
+        >
+          <!-- public 폴더의 파일들은 빌드 시 루트로 복사되어 /public/ 경로 없이 접근 가능 -->
+          <img alt="Go to the GitHub repository" src="/github-mark-white.svg" />
+        </a>
+      </header>
+
       <h2 class="title"><span class="curve-label"></span> bezier curves</h2>
       <div class="t-display"><span>t = </span><span class="t-value"></span></div>
 
