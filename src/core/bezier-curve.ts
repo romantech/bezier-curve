@@ -206,13 +206,13 @@ export class BezierCurve extends Publisher {
 
   private _isColliding(point: Point, mouse: Point): boolean {
     /**
-     * 피타고라스 정리를 이용해 point, mouse 사이의 직선 거리(빗변) 계산
+     * 피타고라스 정리를 이용해 point와 mouse 사이의 거리(빗변) 계산
      * @see https://webp.romantech.net/distance_between_points.png 참고 이미지
      * */
     const dx = point.x - mouse.x;
     const dy = point.y - mouse.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    // 조절점보다 큰 영역으로 지정해서 포인트 선택하기 편하게 설정
+    const distance = Math.sqrt(dx ** 2 + dy ** 2);
+    // 클릭 판정 영역을 넓게 설정하여 선택하기 쉽도록 함
     return distance < STYLE.BASE_POINT_RADIUS * 2;
   }
 
