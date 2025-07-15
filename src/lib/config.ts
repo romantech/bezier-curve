@@ -53,6 +53,7 @@ export const SELECTORS = {
   CURVE_LABEL: '.curve-label',
   CURVE_PICKER: '.curve-picker',
   T_VALUE: '.t-value',
+  POINTS_VALUE: '.points-value',
 
   DURATION_CONTAINER: '.duration',
   DURATION_VALUE: '.duration-value',

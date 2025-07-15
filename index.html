@@ -2,10 +2,14 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link href="/src/styles/global.css" rel="stylesheet" />
-    <link href="/curve.png" rel="icon" type="image/svg+xml" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Bezier Curve</title>
+    <meta
+      content="Learn the principles of Bézier curves by interactively drawing different types and observing the movement of points over time."
+      name="description"
+    />
+    <link href="/src/styles/global.css" rel="stylesheet" />
+    <link href="/curve.png" rel="icon" type="image/png" />
   </head>
   <body>
     <main id="app">
@@ -25,25 +29,26 @@
       </header>
 
       <h2 class="title"><span class="curve-label"></span> bezier curves</h2>
-      <div class="t-display"><span>t = </span><span class="t-value"></span></div>
+      <output class="t-display"><span>t = </span><span class="t-value"></span></output>
 
       <div class="canvas-container no-select">
         <canvas class="static-canvas"></canvas>
         <canvas class="dynamic-canvas"></canvas>
       </div>
       <div class="controls no-select">
-        <button class="toggle-button">start</button>
+        <button class="toggle-button" type="button">start</button>
         <select aria-label="Select Bézier curve" class="curve-picker" name="curve-picker"></select>
         <div class="duration">
-          <button aria-label="Decrease animation duration" data-action="decrease">
+          <button aria-label="Decrease animation duration" data-action="decrease" type="button">
             <img alt="Decrease animation duration" src="/minus.svg" />
           </button>
           <span class="duration-display"><span class="duration-value"></span>s</span>
-          <button aria-label="Increase animation duration" data-action="increase">
+          <button aria-label="Increase animation duration" data-action="increase" type="button">
             <img alt="Increase animation duration" src="/plus.svg" />
           </button>
         </div>
       </div>
+      <code class="points-value"></code>
     </main>
     <!-- type="module" 은 기본적으로 defer 속성을 적용한 것과 동일하게 동작 -->
     <script src="/src/main.ts" type="module"></script>

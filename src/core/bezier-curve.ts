@@ -1,5 +1,4 @@
-import { ACTION, type Action, CanvasRenderer, DURATION, STYLE } from '@/lib';
-import { clamp } from './lerp';
+import { ACTION, type Action, CanvasRenderer, clamp, DURATION, STYLE } from '@/lib';
 import { Publisher } from './observer';
 
 export interface Point {

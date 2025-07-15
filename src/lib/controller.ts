@@ -1,4 +1,5 @@
-import type { BezierCurve, BezierEvent, Observer } from '@/core';
+import type { BezierCurve, BezierEvent, Observer, Point } from '@/core';
+import { truncate } from '@/lib/utils.ts';
 import {
   ACTION,
   type Action,
@@ -28,6 +29,7 @@ const UnsafeElements = {
   $curvePicker: document.querySelector<HTMLSelectElement>(SELECTORS.CURVE_PICKER),
 
   $tValue: document.querySelector<HTMLSpanElement>(SELECTORS.T_VALUE),
+  $pointsValue: document.querySelector<HTMLDivElement>(SELECTORS.POINTS_VALUE),
 
   $duration: document.querySelector<HTMLDivElement>(SELECTORS.DURATION_CONTAINER),
   $durationValue: document.querySelector<HTMLSpanElement>(SELECTORS.DURATION_VALUE),
@@ -59,6 +61,7 @@ export class Controller implements Observer {
       case 'tick':
       case 'setup':
         this.updateTLabel(event.progress);
+        if (event.points) this.updatePointsLabel(event.points);
         break;
       case 'stop':
       case 'pause':
@@ -67,6 +70,14 @@ export class Controller implements Observer {
       default:
         break;
     }
+  }
+
+  public updatePointsLabel(points: Point[]) {
+    const labels = points.map(({ x, y }, i) => {
+      return `P${i}(${truncate(x)},${truncate(y)})`;
+    });
+
+    this.elements.$pointsValue.textContent = labels.join(' ');
   }
 
   public updateCurveLabel(label: string) {
