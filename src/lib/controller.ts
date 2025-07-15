@@ -28,8 +28,9 @@ const UnsafeElements = {
   $curveLabel: document.querySelector<HTMLElement>(SELECTORS.CURVE_LABEL),
   $curvePicker: document.querySelector<HTMLSelectElement>(SELECTORS.CURVE_PICKER),
 
+  $tDisplay: document.querySelector<HTMLOutputElement>(SELECTORS.T_DISPLAY),
   $tValue: document.querySelector<HTMLSpanElement>(SELECTORS.T_VALUE),
-  $pointsValue: document.querySelector<HTMLDivElement>(SELECTORS.POINTS_VALUE),
+  $pointsValue: document.querySelector<HTMLElement>(SELECTORS.POINTS_VALUE),
 
   $duration: document.querySelector<HTMLDivElement>(SELECTORS.DURATION_CONTAINER),
   $durationValue: document.querySelector<HTMLSpanElement>(SELECTORS.DURATION_VALUE),
@@ -57,6 +58,7 @@ export class Controller implements Observer {
     switch (event.type) {
       case 'start':
         this.updateToggleLabel(TOGGLE_LABEL.PAUSE);
+        this._toggleScale(this.elements.$tDisplay, true);
         break;
       case 'tick':
       case 'setup':
@@ -66,6 +68,7 @@ export class Controller implements Observer {
       case 'stop':
       case 'pause':
         this.updateToggleLabel(TOGGLE_LABEL.START);
+        this._toggleScale(this.elements.$tDisplay, false);
         break;
       default:
         break;
@@ -104,6 +107,10 @@ export class Controller implements Observer {
     this._updateDurationButtonStates();
     this._bindEvents(bezierCurve, mapPoints);
     return this;
+  }
+
+  private _toggleScale(element: HTMLElement, highlight: boolean) {
+    element.classList.toggle('scale-150', highlight);
   }
 
   private _populateCurvePicker(

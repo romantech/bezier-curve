@@ -21,11 +21,16 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* 유틸리티 클래스 */
 .no-select {
   -webkit-user-select: none; /* Safari, iOS Safari */
   -webkit-touch-callout: none; /* 롱프레스 컨텍스트 메뉴 방지 */
   -ms-user-select: none; /* IE/Edge */
   user-select: none; /* 표준 */
+}
+
+.scale-150 {
+  transform: scale(1.5);
 }
 
 body {
@@ -115,6 +120,7 @@ body {
 .t-display {
   font-weight: 600;
   color: var(--accent);
+  transition: transform 0.2s ease-in-out;
 }
 
 .main-header {
