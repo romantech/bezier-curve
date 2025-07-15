@@ -9,37 +9,39 @@
   .control-point-popover {
     translate: 0 25px;
   }
-  .driver-popover {
-    max-width: 250px;
-  }
 }
 
-.driver-popover {
+.curve-picker-popover .driver-popover-arrow {
+  right: auto;
+  left: 30px;
+}
+
+.onboard-theme.driver-popover {
   background-color: var(--accent);
   color: var(--text-dark);
 }
 
-.driver-popover-arrow-side-left {
+.onboard-theme .driver-popover-arrow-side-left {
   border-left-color: var(--accent);
 }
 
-.driver-popover-arrow-side-right {
+.onboard-theme .driver-popover-arrow-side-right {
   border-right-color: var(--accent);
 }
 
-.driver-popover-arrow-side-top {
+.onboard-theme .driver-popover-arrow-side-top {
   border-top-color: var(--accent);
 }
 
-.driver-popover-arrow-side-bottom {
+.onboard-theme .driver-popover-arrow-side-bottom {
   border-bottom-color: var(--accent);
 }
 
-.driver-popover-close-btn {
+.onboard-theme .driver-popover-close-btn {
   color: var(--text-dark);
 }
 
-.driver-popover-footer button {
+.onboard-theme .driver-popover-footer button {
   padding: 6px 8px;
   background-color: var(--bg-main);
   color: var(--text-light);
@@ -47,11 +49,11 @@
   border: none;
 }
 
-.driver-popover-footer button:hover {
+.onboard-theme .driver-popover-footer button:hover {
   opacity: 0.9;
   background-color: var(--bg-main);
 }
 
-.driver-popover-progress-text {
+.onboard-theme .driver-popover-progress-text {
   color: var(--text-dark);
 }

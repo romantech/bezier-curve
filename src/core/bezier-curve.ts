@@ -213,7 +213,7 @@ export class BezierCurve extends Publisher {
     const dy = point.y - mouse.y;
     const distance = Math.sqrt(dx ** 2 + dy ** 2);
     // 클릭 판정 영역을 넓게 설정하여 선택하기 쉽도록 함
-    return distance < STYLE.BASE_POINT_RADIUS * 2;
+    return distance < STYLE.BASE_POINT_RADIUS * 2.5;
   }
 
   private _cancelAnimation(): void {
