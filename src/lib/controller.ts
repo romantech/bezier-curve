@@ -4,6 +4,7 @@ import {
   type Action,
   DURATION,
   INITIAL_CURVE,
+  SELECTORS,
   TOGGLE_LABEL,
   type ToggleLabel,
 } from './config';
@@ -20,21 +21,21 @@ export type DefinedElements<T> = {
 };
 
 const UnsafeElements = {
-  $staticCanvas: document.querySelector<HTMLCanvasElement>('.static-canvas'),
-  $dynamicCanvas: document.querySelector<HTMLCanvasElement>('.dynamic-canvas'),
+  $staticCanvas: document.querySelector<HTMLCanvasElement>(SELECTORS.STATIC_CANVAS),
+  $dynamicCanvas: document.querySelector<HTMLCanvasElement>(SELECTORS.DYNAMIC_CANVAS),
 
-  $curveLabel: document.querySelector<HTMLElement>('.curve-label'),
-  $curvePicker: document.querySelector<HTMLSelectElement>('.curve-picker'),
+  $curveLabel: document.querySelector<HTMLElement>(SELECTORS.CURVE_LABEL),
+  $curvePicker: document.querySelector<HTMLSelectElement>(SELECTORS.CURVE_PICKER),
 
-  $tLabel: document.querySelector<HTMLSpanElement>('.t-value'),
+  $tValue: document.querySelector<HTMLSpanElement>(SELECTORS.T_VALUE),
 
-  $duration: document.querySelector<HTMLDivElement>('.duration'),
-  $durationValue: document.querySelector<HTMLSpanElement>('.duration-value'),
+  $duration: document.querySelector<HTMLDivElement>(SELECTORS.DURATION_CONTAINER),
+  $durationValue: document.querySelector<HTMLSpanElement>(SELECTORS.DURATION_VALUE),
 
-  $toggleBtn: document.querySelector<HTMLButtonElement>('.toggle-button'),
-  $onboardBtn: document.querySelector<HTMLButtonElement>('.onboard-button'),
-  $decreaseBtn: document.querySelector<HTMLButtonElement>('button[data-action="decrease"]'),
-  $increaseBtn: document.querySelector<HTMLButtonElement>('button[data-action="increase"]'),
+  $toggleBtn: document.querySelector<HTMLButtonElement>(SELECTORS.TOGGLE_BUTTON),
+  $onboardBtn: document.querySelector<HTMLButtonElement>(SELECTORS.ONBOARD_BUTTON),
+  $decreaseBtn: document.querySelector<HTMLButtonElement>(SELECTORS.DECREASE_BUTTON),
+  $increaseBtn: document.querySelector<HTMLButtonElement>(SELECTORS.INCREASE_BUTTON),
 };
 
 type Elements = DefinedElements<typeof UnsafeElements>;
@@ -73,7 +74,7 @@ export class Controller implements Observer {
   }
 
   public updateTLabel(tValue: number) {
-    this.elements.$tLabel.textContent = `${tValue.toFixed(2)}`;
+    this.elements.$tValue.textContent = `${tValue.toFixed(2)}`;
   }
 
   public updateToggleLabel(label: ToggleLabel) {

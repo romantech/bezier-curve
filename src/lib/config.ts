@@ -45,6 +45,24 @@ export const TOGGLE_LABEL = {
 
 export const INITIAL_CURVE: BezierCurveType = 'cubic';
 
+export const SELECTORS = {
+  CANVAS_CONTAINER: '.canvas-container',
+  STATIC_CANVAS: '.static-canvas',
+  DYNAMIC_CANVAS: '.dynamic-canvas',
+
+  CURVE_LABEL: '.curve-label',
+  CURVE_PICKER: '.curve-picker',
+  T_VALUE: '.t-value',
+
+  DURATION_CONTAINER: '.duration',
+  DURATION_VALUE: '.duration-value',
+
+  TOGGLE_BUTTON: '.toggle-button',
+  ONBOARD_BUTTON: '.onboard-button',
+  DECREASE_BUTTON: 'button[data-action="decrease"]',
+  INCREASE_BUTTON: 'button[data-action="increase"]',
+} as const;
+
 export const CONFIG = {
   STYLE,
   DURATION,

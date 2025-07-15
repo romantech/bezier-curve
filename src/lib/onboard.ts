@@ -1,5 +1,5 @@
 import { type Driver, driver } from 'driver.js';
-import { controller } from './controller';
+import { SELECTORS } from './config';
 
 const ONBOARDING_STORAGE_KEY = 'bezier-curve-onboarded';
 
@@ -14,7 +14,7 @@ const getDriverInstance = () => {
     onDestroyed: () => localStorage.setItem(ONBOARDING_STORAGE_KEY, 'true'),
     steps: [
       {
-        element: controller.elements.$dynamicCanvas,
+        element: SELECTORS.CANVAS_CONTAINER,
         popover: {
           title: 'Move the Control Points',
           description: 'Click and drag the control points to change the curve.',
@@ -24,7 +24,7 @@ const getDriverInstance = () => {
         },
       },
       {
-        element: controller.elements.$toggleBtn,
+        element: SELECTORS.TOGGLE_BUTTON,
         popover: {
           title: 'Pause or Resume',
           description: 'Click the button to pause or resume the animation.',
@@ -33,7 +33,7 @@ const getDriverInstance = () => {
         },
       },
       {
-        element: controller.elements.$curvePicker,
+        element: SELECTORS.CURVE_PICKER,
         popover: {
           title: 'Change Curve Type',
           description: 'Choose a Bézier curve, from linear (1st order) to quintic (5th order).',
@@ -42,7 +42,7 @@ const getDriverInstance = () => {
         },
       },
       {
-        element: controller.elements.$duration,
+        element: SELECTORS.DURATION_CONTAINER,
         popover: {
           title: 'Adjust Duration',
           description:
