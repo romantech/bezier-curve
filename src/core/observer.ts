@@ -1,8 +1,11 @@
+import type { Point } from './bezier-curve';
+
 export type BezierEventType = 'start' | 'stop' | 'pause' | 'setup' | 'tick';
 
 export type BezierEvent = {
   type: BezierEventType;
   progress: number;
+  points?: Point[];
 };
 
 export interface Observer {

@@ -31,6 +31,11 @@ export class BezierCurve extends Publisher {
   private readonly width: number;
   private readonly height: number;
 
+  /** 캔버스 너비 정규화를 위한 곱셈용 역수 (1 / this.width) */
+  private readonly inverseWidth: number;
+  /** 캔버스 높이 정규화를 위한 곱셈용 역수 (1 / this.height) */
+  private readonly inverseHeight: number;
+
   constructor(options: BezierCurveOptions) {
     super();
     this.points = options.points.slice();
@@ -47,6 +52,15 @@ export class BezierCurve extends Publisher {
     this.width = this.dynamicCanvas.clientWidth;
     this.height = this.dynamicCanvas.clientHeight;
 
+    /**
+     * this.points는 캔버스 기준(px) 좌표이므로, 0~1 범위로 정규화하려면 point ÷ width, point ÷ height 연산이 필요함.
+     * 나눗셈보다 곱셈의 성능 비용이 낮으므로 point ✕ inverseWidth, point ✕ inverseHeight 방식으로 처리하면 효율적임.
+     * 예를 들어 캔버스 너비가 500이면 inverseWidth는 0.002가 되고, point.x가 50이면 50 ✕ 0.002 → 0.1이 정규화된 값.
+     * 역수란 어떤 수에 곱했을 때 1이 되는 값. (예: 10의 역수 = 1 ÷ 10 = 0.1)
+     */
+    this.inverseWidth = 1 / this.width;
+    this.inverseHeight = 1 / this.height;
+
     this._addEventListeners();
   }
 
@@ -60,6 +74,13 @@ export class BezierCurve extends Publisher {
 
   private get _gridSize() {
     return this.width / STYLE.GRID_DIVISIONS;
+  }
+
+  private get _normalizedPoints(): Point[] {
+    return this.points.map(({ x, y }) => ({
+      x: x * this.inverseWidth,
+      y: y * this.inverseHeight,
+    }));
   }
 
   public drawLayer(type: 'static' | 'dynamic' | 'both', t = 0) {
@@ -120,7 +141,7 @@ export class BezierCurve extends Publisher {
   public setup() {
     this.stop();
     this.drawLayer('both');
-    this.notify({ type: 'setup', progress: this.progress });
+    this.notify({ type: 'setup', progress: this.progress, points: this._normalizedPoints });
   }
 
   public setPoints(newPoints: Point[]) {
