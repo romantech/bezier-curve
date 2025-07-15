@@ -52,9 +52,9 @@ export const SELECTORS = {
 
   CURVE_LABEL: '.curve-label',
   CURVE_PICKER: '.curve-picker',
-  T_DISPLAY: '.t-display',
-  T_VALUE: '.t-value',
-  POINTS_VALUE: '.points-value',
+  PROGRESS: '.progress',
+  PROGRESS_VALUE: '.progress [data-progress-value]',
+  CONTROL_POINTS: '.control-points',
 
   DURATION_CONTAINER: '.duration',
   DURATION_VALUE: '.duration-value',
@@ -71,6 +71,7 @@ export const CONFIG = {
   ACTION,
   INITIAL_CURVE,
   TOGGLE_LABEL,
+  SELECTORS,
 } as const;
 
 export type Action = (typeof ACTION)[keyof typeof ACTION];

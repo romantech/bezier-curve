@@ -96,7 +96,7 @@ body {
   gap: 12px;
 }
 
-.title {
+.curve-title {
   margin: 0 0 8px;
   padding: 0;
   text-transform: capitalize;
@@ -117,7 +117,7 @@ body {
   background-size: 1.1rem;
 }
 
-.t-display {
+.progress {
   font-weight: 600;
   color: var(--accent);
   transition: transform 0.2s ease-in-out;
@@ -181,13 +181,13 @@ body {
   pointer-events: none;
 }
 
-.t-display,
-.points-value {
+.progress,
+.control-points {
   font-family: "Source Code Pro", Consolas, monospace;
   font-style: italic;
 }
 
-.points-value {
+.control-points {
   padding: 20px 16px 16px;
   font-size: 12px;
   color: dimgray;

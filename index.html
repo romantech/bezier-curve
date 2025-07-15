@@ -28,8 +28,8 @@
         </a>
       </header>
 
-      <h2 class="title"><span class="curve-label"></span> bezier curves</h2>
-      <output class="t-display"><span>t = </span><span class="t-value"></span></output>
+      <h2 class="curve-title"><span class="curve-label"></span> bezier curves</h2>
+      <output class="progress"><span>t = </span><span data-progress-value></span></output>
 
       <div class="canvas-container no-select">
         <canvas class="static-canvas"></canvas>
@@ -48,7 +48,7 @@
           </button>
         </div>
       </div>
-      <code class="points-value"></code>
+      <code class="control-points"></code>
     </main>
     <!-- type="module" 은 기본적으로 defer 속성을 적용한 것과 동일하게 동작 -->
     <script src="/src/main.ts" type="module"></script>

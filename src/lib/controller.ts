@@ -28,9 +28,9 @@ const UnsafeElements = {
   $curveLabel: document.querySelector<HTMLElement>(SELECTORS.CURVE_LABEL),
   $curvePicker: document.querySelector<HTMLSelectElement>(SELECTORS.CURVE_PICKER),
 
-  $tDisplay: document.querySelector<HTMLOutputElement>(SELECTORS.T_DISPLAY),
-  $tValue: document.querySelector<HTMLSpanElement>(SELECTORS.T_VALUE),
-  $pointsValue: document.querySelector<HTMLElement>(SELECTORS.POINTS_VALUE),
+  $progress: document.querySelector<HTMLOutputElement>(SELECTORS.PROGRESS),
+  $progressValue: document.querySelector<HTMLSpanElement>(SELECTORS.PROGRESS_VALUE),
+  $controlPoints: document.querySelector<HTMLElement>(SELECTORS.CONTROL_POINTS),
 
   $duration: document.querySelector<HTMLDivElement>(SELECTORS.DURATION_CONTAINER),
   $durationValue: document.querySelector<HTMLSpanElement>(SELECTORS.DURATION_VALUE),
@@ -58,37 +58,37 @@ export class Controller implements Observer {
     switch (event.type) {
       case 'start':
         this.updateToggleLabel(TOGGLE_LABEL.PAUSE);
-        this._toggleScale(this.elements.$tDisplay, true);
+        this._toggleScale(this.elements.$progress, true);
         break;
       case 'tick':
       case 'setup':
-        this.updateTLabel(event.progress);
-        if (event.points) this.updatePointsLabel(event.points);
+        this.updateProgressValue(event.progress);
+        if (event.points) this.updateControlPoints(event.points);
         break;
       case 'stop':
       case 'pause':
         this.updateToggleLabel(TOGGLE_LABEL.START);
-        this._toggleScale(this.elements.$tDisplay, false);
+        this._toggleScale(this.elements.$progress, false);
         break;
       default:
         break;
     }
   }
 
-  public updatePointsLabel(points: Point[]) {
+  public updateControlPoints(points: Point[]) {
     const labels = points.map(({ x, y }, i) => {
       return `P${i}(${truncate(x)},${truncate(y)})`;
     });
 
-    this.elements.$pointsValue.textContent = labels.join(' ');
+    this.elements.$controlPoints.textContent = labels.join(' ');
   }
 
   public updateCurveLabel(label: string) {
     this.elements.$curveLabel.textContent = label;
   }
 
-  public updateTLabel(tValue: number) {
-    this.elements.$tValue.textContent = `${tValue.toFixed(2)}`;
+  public updateProgressValue(t: number) {
+    this.elements.$progressValue.textContent = `${t.toFixed(2)}`;
   }
 
   public updateToggleLabel(label: ToggleLabel) {
