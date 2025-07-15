@@ -12,3 +12,14 @@ export const truncate = (num: number, n: number = 2): number => {
   const factor = 10 ** n;
   return Math.trunc(num * factor) / factor;
 };
+
+export const isMobile = (): boolean => {
+  // 포인터가 터치 방식이거나
+  const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
+  // 호버 기능이 없거나
+  const hasNoHover = window.matchMedia('(hover: none)').matches;
+  // 화면 폭이 768px 이하인 경우
+  const isSmallScreen = window.matchMedia('(max-width: 768px)').matches;
+
+  return isCoarsePointer || hasNoHover || isSmallScreen;
+};
