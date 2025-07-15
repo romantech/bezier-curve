@@ -113,10 +113,8 @@ body {
 }
 
 .t-display {
-  font-family: "Source Code Pro", Consolas, monospace;
   font-weight: 600;
   color: var(--accent);
-  font-style: italic;
 }
 
 .main-header {
@@ -177,11 +175,15 @@ body {
   pointer-events: none;
 }
 
+.t-display,
+.points-value {
+  font-family: "Source Code Pro", Consolas, monospace;
+  font-style: italic;
+}
+
 .points-value {
   padding: 20px 16px 16px;
-  font-family: "Source Code Pro", Consolas, monospace;
   font-size: 12px;
-  font-style: italic;
   color: dimgray;
   display: flex;
   flex-wrap: wrap;
