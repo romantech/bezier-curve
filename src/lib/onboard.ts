@@ -1,5 +1,6 @@
 import { type Driver, driver } from 'driver.js';
 import { SELECTORS } from './config';
+import { isMobile } from './utils';
 
 const STORAGE_KEY_ONBOARDED = 'bezier-curve-onboarded';
 const CLASS_ONBOARD_THEME = 'onboard-theme';
@@ -21,7 +22,7 @@ const getDriverInstance = () => {
           title: 'Move the Control Points',
           description: 'Click and drag the control points to change the curve.',
           popoverClass: `${CLASS_ONBOARD_THEME} control-point-popover`,
-          side: 'top',
+          side: isMobile() ? 'bottom' : 'top',
           align: 'center',
         },
       },

@@ -5,15 +5,15 @@
   translate: 0 40px;
 }
 
-@media (hover: none) {
+@media (hover: none) and (pointer: coarse) {
   .control-point-popover {
-    translate: 0 25px;
+    translate: 0 -30px;
   }
-}
 
-.curve-picker-popover .driver-popover-arrow {
-  right: auto;
-  left: 30px;
+  .curve-picker-popover .driver-popover-arrow {
+    right: auto;
+    translate: 48px 0;
+  }
 }
 
 .onboard-theme.driver-popover {
