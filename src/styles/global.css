@@ -21,6 +21,13 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.no-select {
+  -webkit-user-select: none; /* Safari, iOS Safari */
+  -webkit-touch-callout: none; /* 롱프레스 컨텍스트 메뉴 방지 */
+  -ms-user-select: none; /* IE/Edge */
+  user-select: none; /* 표준 */
+}
+
 body {
   margin: 0;
   background-color: var(--bg-main);
@@ -150,7 +157,6 @@ body {
   border: 1px solid var(--border-dark);
   padding: 8px 0;
   border-radius: 5px;
-  user-select: none;
   width: 48px;
   display: flex;
   align-items: center;
@@ -163,7 +169,6 @@ body {
   padding: 10px;
   display: grid;
   place-items: center;
-  user-select: none;
 }
 
 .duration > button:disabled {
