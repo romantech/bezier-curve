@@ -4,3 +4,4 @@ export * from './controller';
 export * from './onboard';
 export * from './presets';
 export * from './renderer';
+export * from './utils';

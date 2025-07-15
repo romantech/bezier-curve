@@ -21,11 +21,23 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* 유틸리티 클래스 */
+.no-select {
+  -webkit-user-select: none; /* Safari, iOS Safari */
+  -webkit-touch-callout: none; /* 롱프레스 컨텍스트 메뉴 방지 */
+  -ms-user-select: none; /* IE/Edge */
+  user-select: none; /* 표준 */
+}
+
+.scale-150 {
+  transform: scale(1.5);
+}
+
 body {
   margin: 0;
   background-color: var(--bg-main);
   color: var(--text-light);
-  height: 100vh;
+  height: 100dvh;
 }
 
 #app {
@@ -84,7 +96,7 @@ body {
   gap: 12px;
 }
 
-.title {
+.curve-title {
   margin: 0 0 8px;
   padding: 0;
   text-transform: capitalize;
@@ -105,10 +117,10 @@ body {
   background-size: 1.1rem;
 }
 
-.t-display {
+.progress {
   font-weight: 600;
   color: var(--accent);
-  font-style: italic;
+  transition: transform 0.2s ease-in-out;
 }
 
 .main-header {
@@ -150,7 +162,6 @@ body {
   border: 1px solid var(--border-dark);
   padding: 8px 0;
   border-radius: 5px;
-  user-select: none;
   width: 48px;
   display: flex;
   align-items: center;
@@ -163,10 +174,24 @@ body {
   padding: 10px;
   display: grid;
   place-items: center;
-  user-select: none;
 }
 
 .duration > button:disabled {
   opacity: 0.5;
   pointer-events: none;
+}
+
+.progress,
+.control-points {
+  font-family: "Source Code Pro", Consolas, monospace;
+  font-style: italic;
+}
+
+.control-points {
+  padding: 20px 16px 16px;
+  font-size: 12px;
+  color: dimgray;
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 200px;
 }

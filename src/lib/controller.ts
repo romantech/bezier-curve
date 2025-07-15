@@ -1,9 +1,11 @@
-import type { BezierCurve, BezierEvent, Observer } from '@/core';
+import type { BezierCurve, BezierEvent, Observer, Point } from '@/core';
+import { truncate } from '@/lib/utils.ts';
 import {
   ACTION,
   type Action,
   DURATION,
   INITIAL_CURVE,
+  SELECTORS,
   TOGGLE_LABEL,
   type ToggleLabel,
 } from './config';
@@ -20,21 +22,23 @@ export type DefinedElements<T> = {
 };
 
 const UnsafeElements = {
-  $staticCanvas: document.querySelector<HTMLCanvasElement>('.static-canvas'),
-  $dynamicCanvas: document.querySelector<HTMLCanvasElement>('.dynamic-canvas'),
+  $staticCanvas: document.querySelector<HTMLCanvasElement>(SELECTORS.STATIC_CANVAS),
+  $dynamicCanvas: document.querySelector<HTMLCanvasElement>(SELECTORS.DYNAMIC_CANVAS),
 
-  $curveLabel: document.querySelector<HTMLElement>('.curve-label'),
-  $curvePicker: document.querySelector<HTMLSelectElement>('.curve-picker'),
+  $curveLabel: document.querySelector<HTMLElement>(SELECTORS.CURVE_LABEL),
+  $curvePicker: document.querySelector<HTMLSelectElement>(SELECTORS.CURVE_PICKER),
 
-  $tLabel: document.querySelector<HTMLSpanElement>('.t-value'),
+  $progress: document.querySelector<HTMLOutputElement>(SELECTORS.PROGRESS),
+  $progressValue: document.querySelector<HTMLSpanElement>(SELECTORS.PROGRESS_VALUE),
+  $controlPoints: document.querySelector<HTMLElement>(SELECTORS.CONTROL_POINTS),
 
-  $duration: document.querySelector<HTMLDivElement>('.duration'),
-  $durationValue: document.querySelector<HTMLSpanElement>('.duration-value'),
+  $duration: document.querySelector<HTMLDivElement>(SELECTORS.DURATION_CONTAINER),
+  $durationValue: document.querySelector<HTMLSpanElement>(SELECTORS.DURATION_VALUE),
 
-  $toggleBtn: document.querySelector<HTMLButtonElement>('.toggle-button'),
-  $onboardBtn: document.querySelector<HTMLButtonElement>('.onboard-button'),
-  $decreaseBtn: document.querySelector<HTMLButtonElement>('button[data-action="decrease"]'),
-  $increaseBtn: document.querySelector<HTMLButtonElement>('button[data-action="increase"]'),
+  $toggleBtn: document.querySelector<HTMLButtonElement>(SELECTORS.TOGGLE_BUTTON),
+  $onboardBtn: document.querySelector<HTMLButtonElement>(SELECTORS.ONBOARD_BUTTON),
+  $decreaseBtn: document.querySelector<HTMLButtonElement>(SELECTORS.DECREASE_BUTTON),
+  $increaseBtn: document.querySelector<HTMLButtonElement>(SELECTORS.INCREASE_BUTTON),
 };
 
 type Elements = DefinedElements<typeof UnsafeElements>;
@@ -54,26 +58,37 @@ export class Controller implements Observer {
     switch (event.type) {
       case 'start':
         this.updateToggleLabel(TOGGLE_LABEL.PAUSE);
+        this._toggleScale(this.elements.$progress, true);
         break;
       case 'tick':
       case 'setup':
-        this.updateTLabel(event.progress);
+        this.updateProgressValue(event.progress);
+        if (event.points) this.updateControlPoints(event.points);
         break;
       case 'stop':
       case 'pause':
         this.updateToggleLabel(TOGGLE_LABEL.START);
+        this._toggleScale(this.elements.$progress, false);
         break;
       default:
         break;
     }
   }
 
+  public updateControlPoints(points: Point[]) {
+    const labels = points.map(({ x, y }, i) => {
+      return `P${i}(${truncate(x)},${truncate(y)})`;
+    });
+
+    this.elements.$controlPoints.textContent = labels.join(' ');
+  }
+
   public updateCurveLabel(label: string) {
     this.elements.$curveLabel.textContent = label;
   }
 
-  public updateTLabel(tValue: number) {
-    this.elements.$tLabel.textContent = `${tValue.toFixed(2)}`;
+  public updateProgressValue(t: number) {
+    this.elements.$progressValue.textContent = `${t.toFixed(2)}`;
   }
 
   public updateToggleLabel(label: ToggleLabel) {
@@ -92,6 +107,10 @@ export class Controller implements Observer {
     this._updateDurationButtonStates();
     this._bindEvents(bezierCurve, mapPoints);
     return this;
+  }
+
+  private _toggleScale(element: HTMLElement, highlight: boolean) {
+    element.classList.toggle('scale-150', highlight);
   }
 
   private _populateCurvePicker(

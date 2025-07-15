@@ -1,7 +1,8 @@
 import { type Driver, driver } from 'driver.js';
-import { controller } from './controller';
+import { SELECTORS } from './config';
 
-const ONBOARDING_STORAGE_KEY = 'bezier-curve-onboarded';
+const STORAGE_KEY_ONBOARDED = 'bezier-curve-onboarded';
+const CLASS_ONBOARD_THEME = 'onboard-theme';
 
 let onboardDriver: Driver | null = null;
 
@@ -11,20 +12,21 @@ const getDriverInstance = () => {
   onboardDriver = driver({
     showProgress: true,
     overlayOpacity: 0.5,
-    onDestroyed: () => localStorage.setItem(ONBOARDING_STORAGE_KEY, 'true'),
+    popoverClass: CLASS_ONBOARD_THEME,
+    onDestroyed: () => localStorage.setItem(STORAGE_KEY_ONBOARDED, 'true'),
     steps: [
       {
-        element: controller.elements.$dynamicCanvas,
+        element: SELECTORS.CANVAS_CONTAINER,
         popover: {
           title: 'Move the Control Points',
           description: 'Click and drag the control points to change the curve.',
-          popoverClass: 'control-point-popover',
+          popoverClass: `${CLASS_ONBOARD_THEME} control-point-popover`,
           side: 'top',
           align: 'center',
         },
       },
       {
-        element: controller.elements.$toggleBtn,
+        element: SELECTORS.TOGGLE_BUTTON,
         popover: {
           title: 'Pause or Resume',
           description: 'Click the button to pause or resume the animation.',
@@ -33,16 +35,17 @@ const getDriverInstance = () => {
         },
       },
       {
-        element: controller.elements.$curvePicker,
+        element: SELECTORS.CURVE_PICKER,
         popover: {
           title: 'Change Curve Type',
           description: 'Choose a Bézier curve, from linear (1st order) to quintic (5th order).',
+          popoverClass: `${CLASS_ONBOARD_THEME} curve-picker-popover`,
           side: 'top',
           align: 'start',
         },
       },
       {
-        element: controller.elements.$duration,
+        element: SELECTORS.DURATION_CONTAINER,
         popover: {
           title: 'Adjust Duration',
           description:
@@ -68,6 +71,6 @@ export const startOnboarding = (force: boolean = false) => {
   const isInFrame = window.self !== window.top;
   if (isInFrame) return;
 
-  const hasSeenOnboarding = localStorage.getItem(ONBOARDING_STORAGE_KEY);
+  const hasSeenOnboarding = localStorage.getItem(STORAGE_KEY_ONBOARDED);
   if (!hasSeenOnboarding) getDriverInstance().drive();
 };

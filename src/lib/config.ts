@@ -45,12 +45,33 @@ export const TOGGLE_LABEL = {
 
 export const INITIAL_CURVE: BezierCurveType = 'cubic';
 
+export const SELECTORS = {
+  CANVAS_CONTAINER: '.canvas-container',
+  STATIC_CANVAS: '.static-canvas',
+  DYNAMIC_CANVAS: '.dynamic-canvas',
+
+  CURVE_LABEL: '.curve-label',
+  CURVE_PICKER: '.curve-picker',
+  PROGRESS: '.progress',
+  PROGRESS_VALUE: '.progress [data-progress-value]',
+  CONTROL_POINTS: '.control-points',
+
+  DURATION_CONTAINER: '.duration',
+  DURATION_VALUE: '.duration-value',
+
+  TOGGLE_BUTTON: '.toggle-button',
+  ONBOARD_BUTTON: '.onboard-button',
+  DECREASE_BUTTON: 'button[data-action="decrease"]',
+  INCREASE_BUTTON: 'button[data-action="increase"]',
+} as const;
+
 export const CONFIG = {
   STYLE,
   DURATION,
   ACTION,
   INITIAL_CURVE,
   TOGGLE_LABEL,
+  SELECTORS,
 } as const;
 
 export type Action = (typeof ACTION)[keyof typeof ACTION];
