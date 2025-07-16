@@ -76,11 +76,18 @@ export class Controller implements Observer {
   }
 
   public updateControlPoints(points: Point[]) {
-    const labels = points.map(({ x, y }, i) => {
-      return `P${i}(${truncate(x)},${truncate(y)})`;
-    });
+    const labelTexts = points.map(({ x, y }, i) => `P${i}(${truncate(x)},${truncate(y)})`);
 
-    this.elements.$controlPoints.textContent = labels.join(' ');
+    const createLabelElement = (content: string, idx: number) => {
+      const span = document.createElement('span');
+      span.textContent = content;
+      span.dataset.idx = idx.toString();
+      return span;
+    };
+
+    const labelElements = labelTexts.map((v, i) => createLabelElement(v, i));
+
+    this.elements.$controlPoints.replaceChildren(...labelElements);
   }
 
   public updateCurveLabel(label: string) {
