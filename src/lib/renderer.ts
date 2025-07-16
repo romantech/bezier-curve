@@ -26,15 +26,15 @@ export class CanvasRenderer {
   /** 베지에 곡선 가이드, 초기 조절점/레이블 같은 정적 요소 렌더링 */
   public drawStaticLayer(points: Point[]): void {
     const ctx = this.staticCtx;
-    this._clearLayer(ctx); // 베지에 곡선 차수(degree) 변경 시 가이드를 다시 그려야하므로 캔버스 초기화
+    this.clearLayer(ctx); // 베지에 곡선 차수(degree) 변경 시 가이드를 다시 그려야하므로 캔버스 초기화
 
     const gridSize = this.width / STYLE.GRID_DIVISIONS;
     // 좌상단, 우하단 경계는 제외하고 내부 영역에만 격자 추가
     for (let x = gridSize; x < this.width; x += gridSize) {
-      this._drawLine(ctx, { x, y: 0 }, { x, y: this.height }, STYLE.GRID_COLOR); // 세로선(상 > 하 라인 생선)
+      this.drawLine(ctx, { x, y: 0 }, { x, y: this.height }, STYLE.GRID_COLOR); // 세로선(상 > 하 라인 생선)
     }
     for (let y = gridSize; y < this.height; y += gridSize) {
-      this._drawLine(ctx, { x: 0, y }, { x: this.width, y }, STYLE.GRID_COLOR); // 가로선(좌 > 우 라인 생성)
+      this.drawLine(ctx, { x: 0, y }, { x: this.width, y }, STYLE.GRID_COLOR); // 가로선(좌 > 우 라인 생성)
     }
 
     // ① 베지에 곡선 가이드
@@ -54,15 +54,15 @@ export class CanvasRenderer {
     // ② 조절점을 잇는 안내선 (점선)
     ctx.setLineDash(STYLE.GUIDE_DASH); // 점선 모드로 변경. [점선 5px, 빈공간 5px] 형태로 반복
     for (let i = 0; i < points.length - 1; i++) {
-      this._drawLine(ctx, points[i], points[i + 1], STYLE.GUIDE_COLOR);
+      this.drawLine(ctx, points[i], points[i + 1], STYLE.GUIDE_COLOR);
     }
     ctx.setLineDash([]); // 점선 모드 해제 (실선으로 복원)
 
     // ③ 조절점 및 레이블
     points.forEach((p, i) => {
-      this._drawPoint(ctx, p, STYLE.CTRL_POINT_COLOR);
+      this.drawPoint(ctx, p, STYLE.CTRL_POINT_COLOR);
       const offsetX = i % 2 === 0 ? -26 : 10;
-      this._drawLabel(ctx, p, `P${i}`, offsetX, -8);
+      this.drawLabel(ctx, p, `P${i}`, offsetX, -8);
     });
   }
 
@@ -70,7 +70,7 @@ export class CanvasRenderer {
   public drawDynamicLayer(points: Point[], t: number): void {
     const ctx = this.dynamicCtx;
     // 이전에 그렸던 모든 그래픽 요소 제거 (잔상처럼 보이는 현상 없애기 위해)
-    this._clearLayer(ctx);
+    this.clearLayer(ctx);
 
     let currentPoints = points;
     let level = 0;
@@ -84,13 +84,13 @@ export class CanvasRenderer {
         const [p1, p2] = [currentPoints[i], currentPoints[i + 1]];
         const interpolatedPoint = getInterpolatedPoint(p1, p2, t);
         nextPoints.push(interpolatedPoint);
-        this._drawPoint(ctx, interpolatedPoint, color, STYLE.CTRL_POINT_RADIUS);
+        this.drawPoint(ctx, interpolatedPoint, color, STYLE.CTRL_POINT_RADIUS);
       }
 
       // 계산한 보간점 사이를 직선으로 연결
       for (let i = 0; i < nextPoints.length - 1; i++) {
         const [q1, q2] = [nextPoints[i], nextPoints[i + 1]];
-        this._drawLine(ctx, q1, q2, color, STYLE.INTERP_WIDTH);
+        this.drawLine(ctx, q1, q2, color, STYLE.INTERP_WIDTH);
       }
 
       currentPoints = nextPoints;
@@ -99,17 +99,17 @@ export class CanvasRenderer {
 
     // 모든 보간이 끝나고 마지막 남은 점(베지에 곡선 위의 점) 표시
     const finalPoint = currentPoints[0];
-    this._drawPoint(ctx, finalPoint, this.finalPointColor, STYLE.CTRL_POINT_RADIUS);
-    this._drawLabel(ctx, finalPoint, 'P', -20, 20);
+    this.drawPoint(ctx, finalPoint, this.finalPointColor, STYLE.CTRL_POINT_RADIUS);
+    this.drawLabel(ctx, finalPoint, 'P', -20, 20);
   }
 
-  private _clearLayer(ctx: CanvasRenderingContext2D) {
+  private clearLayer(ctx: CanvasRenderingContext2D) {
     // clearRect() 메서드는 캔버스에서 특정 영역을 지울 때 사용
     // clearRect(x, y, width, height) - (x,y) 좌표부터 width×height 크기만큼 지움
     ctx.clearRect(0, 0, this.width, this.height);
   }
 
-  private _drawLine(
+  private drawLine(
     ctx: CanvasRenderingContext2D,
     start: Point,
     end: Point,
@@ -124,7 +124,7 @@ export class CanvasRenderer {
     ctx.stroke(); // 정의된 경로에 따라 캔버스에 선 렌더링
   }
 
-  private _drawPoint(
+  private drawPoint(
     ctx: CanvasRenderingContext2D,
     point: Point,
     color: string,
@@ -138,7 +138,7 @@ export class CanvasRenderer {
     ctx.fill();
   }
 
-  private _drawLabel(
+  private drawLabel(
     ctx: CanvasRenderingContext2D,
     point: Point,
     text: string,
