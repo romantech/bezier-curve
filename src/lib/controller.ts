@@ -54,45 +54,35 @@ export class Controller implements Observer {
     this.elements = UnsafeElements as Elements;
   }
 
-  public update(event: BezierEvent): void {
-    switch (event.type) {
+  public update(e: BezierEvent): void {
+    switch (e.type) {
       case 'start':
         this.updateToggleLabel(TOGGLE_LABEL.PAUSE);
-        this._toggleScale(this.elements.$progress, true);
+        this.toggleScale(this.elements.$progress, true);
         break;
       case 'tick':
+        this.updateProgressValue(e.progress);
+        break;
       case 'setup':
-        this.updateProgressValue(event.progress);
-        if (event.points) this.updateControlPoints(event.points);
+        this.updateProgressValue(e.progress);
+        this.renderPointLabels(e.points);
         break;
       case 'stop':
       case 'pause':
         this.updateToggleLabel(TOGGLE_LABEL.START);
-        this._toggleScale(this.elements.$progress, false);
+        this.toggleScale(this.elements.$progress, false);
         break;
+      case 'dragMove':
+      case 'dragEnd': {
+        if (e.dragPointIdx === null) return;
+        const target = this.getPointLabelElement(e.dragPointIdx);
+        this.toggleHighlight(target, e.type === 'dragMove');
+        this.updatePointLabel(e.dragPointIdx, e.points[e.dragPointIdx]);
+        break;
+      }
       default:
-        break;
+        console.warn(`Unknown event type: ${e.type}`, e);
     }
-  }
-
-  public updateControlPoints(points: Point[]) {
-    const labels = points.map(({ x, y }, i) => {
-      return `P${i}(${truncate(x)},${truncate(y)})`;
-    });
-
-    this.elements.$controlPoints.textContent = labels.join(' ');
-  }
-
-  public updateCurveLabel(label: string) {
-    this.elements.$curveLabel.textContent = label;
-  }
-
-  public updateProgressValue(t: number) {
-    this.elements.$progressValue.textContent = `${t.toFixed(2)}`;
-  }
-
-  public updateToggleLabel(label: ToggleLabel) {
-    this.elements.$toggleBtn.textContent = label;
   }
 
   public init(
@@ -102,18 +92,59 @@ export class Controller implements Observer {
     initialCurve: BezierCurveType = INITIAL_CURVE,
   ) {
     this.updateCurveLabel(initialCurve);
-    this._populateCurvePicker(curveTypes, initialCurve);
-    this._updateDurationValue(DURATION.DEFAULT);
-    this._updateDurationButtonStates();
-    this._bindEvents(bezierCurve, mapPoints);
+    this.populateCurvePicker(curveTypes, initialCurve);
+    this.updateDurationValue(DURATION.DEFAULT);
+    this.updateDurationButtonStates();
+    this.bindEvents(bezierCurve, mapPoints);
     return this;
   }
 
-  private _toggleScale(element: HTMLElement, highlight: boolean) {
-    element.classList.toggle('scale-150', highlight);
+  private updateCurveLabel(label: string) {
+    this.elements.$curveLabel.textContent = label;
   }
 
-  private _populateCurvePicker(
+  private updateProgressValue(t: number) {
+    this.elements.$progressValue.textContent = `${t.toFixed(2)}`;
+  }
+
+  private updateToggleLabel(label: ToggleLabel) {
+    this.elements.$toggleBtn.textContent = label;
+  }
+
+  private renderPointLabels(points: Point[]) {
+    const labelTexts = points.map(({ x, y }, i) => `P${i}(${truncate(x)},${truncate(y)})`);
+
+    const createLabelElement = (content: string) => {
+      const span = document.createElement('span');
+      span.textContent = content;
+      return span;
+    };
+
+    const labelElements = labelTexts.map(createLabelElement);
+
+    this.elements.$controlPoints.replaceChildren(...labelElements);
+  }
+  private getPointLabelElement(idx: number) {
+    return this.elements.$controlPoints.children[idx] as HTMLSpanElement;
+  }
+
+  private updatePointLabel(pointIdx: number, point: Point): void {
+    const target = this.getPointLabelElement(pointIdx);
+    if (!target) return;
+
+    const [truncX, truncY] = [truncate(point.x), truncate(point.y)];
+    target.textContent = `P${pointIdx}(${truncX},${truncY})`;
+  }
+
+  private toggleHighlight(target: HTMLElement, shouldHighlight: boolean) {
+    target.classList.toggle('highlight', shouldHighlight);
+  }
+
+  private toggleScale(target: HTMLElement, shouldScale: boolean) {
+    target.classList.toggle('scale-150', shouldScale);
+  }
+
+  private populateCurvePicker(
     curveTypes: readonly BezierCurveType[],
     initialCurve: BezierCurveType,
   ) {
@@ -126,7 +157,7 @@ export class Controller implements Observer {
     });
   }
 
-  private _bindEvents(bezierCurve: BezierCurve, mapPoints: MapPoints) {
+  private bindEvents(bezierCurve: BezierCurve, mapPoints: MapPoints) {
     const { $toggleBtn, $curvePicker, $duration, $onboardBtn } = this.elements;
 
     $toggleBtn.addEventListener('click', bezierCurve.togglePlayPause.bind(bezierCurve));
@@ -146,22 +177,22 @@ export class Controller implements Observer {
       const action = btn.dataset.action;
       if (action !== ACTION.INCREASE && action !== ACTION.DECREASE) return;
 
-      this._handleDurationChange(bezierCurve, action);
+      this.handleDurationChange(bezierCurve, action);
     });
   }
 
-  private _handleDurationChange(bezierCurve: BezierCurve, action: Action) {
+  private handleDurationChange(bezierCurve: BezierCurve, action: Action) {
     const newDuration = bezierCurve.changeDuration(action);
-    this._updateDurationValue(newDuration);
-    this._updateDurationButtonStates();
+    this.updateDurationValue(newDuration);
+    this.updateDurationButtonStates();
   }
 
-  private _updateDurationValue(duration: number) {
+  private updateDurationValue(duration: number) {
     this.elements.$durationValue.textContent = `${Math.trunc(duration / 1000)}`;
     this.elements.$durationValue.dataset.value = `${duration}`;
   }
 
-  private _updateDurationButtonStates() {
+  private updateDurationButtonStates() {
     const { $durationValue, $decreaseBtn, $increaseBtn } = this.elements;
 
     const ms = parseInt($durationValue.dataset.value ?? `${DURATION.DEFAULT}`, 10);
