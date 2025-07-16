@@ -1,19 +1,21 @@
 import { BezierCurve } from '@/core';
 import {
   BezierPointRatios,
-  controller,
+  CONFIG,
+  Controller,
   createPointMapper,
-  INITIAL_CURVE,
+  getElements,
   setupCanvasCtx,
   setupCanvasResolution,
   startOnboarding,
 } from '@/lib';
 
 function setupApp() {
-  const { $staticCanvas, $dynamicCanvas } = controller.elements;
   try {
-    const { staticCtx, dynamicCtx } = setupCanvasCtx($staticCanvas, $dynamicCanvas);
+    const elements = getElements();
+    const { $staticCanvas, $dynamicCanvas } = elements;
 
+    const { staticCtx, dynamicCtx } = setupCanvasCtx($staticCanvas, $dynamicCanvas);
     const { cssWidth, cssHeight } = setupCanvasResolution(
       $staticCanvas,
       $dynamicCanvas,
@@ -22,12 +24,14 @@ function setupApp() {
     );
 
     const mapPoints = createPointMapper(cssWidth, cssHeight);
-    const points = mapPoints(BezierPointRatios[INITIAL_CURVE]);
+    const points = mapPoints(BezierPointRatios[CONFIG.INITIAL_CURVE]);
 
     const bezierCurve = new BezierCurve({ staticCtx, dynamicCtx, points });
-    bezierCurve.subscribe(controller).setup();
+    const controller = new Controller({ bezierCurve, mapPoints, elements });
 
-    controller.init(bezierCurve, mapPoints);
+    bezierCurve.subscribe(controller).setup();
+    controller.init();
+
     startOnboarding();
   } catch (e) {
     console.error('앱 초기화 실패:', e);
