@@ -61,6 +61,8 @@ export class Controller implements Observer {
         this.toggleScale(this.elements.$progress, true);
         break;
       case 'tick':
+        this.updateProgressValue(e.progress);
+        break;
       case 'setup':
         this.updateProgressValue(e.progress);
         this.renderPointLabels(e.points);
@@ -72,15 +74,14 @@ export class Controller implements Observer {
         break;
       case 'dragStart':
       case 'dragEnd': {
-        if (e.dragPointIdx !== null) {
-          const target = this.getPointLabelElement(e.dragPointIdx);
-          this.toggleHighlight(target, e.type === 'dragStart');
-          this.updatePointLabel(e.dragPointIdx, e.points[e.dragPointIdx]);
-        }
+        if (e.dragPointIdx === null) return;
+        const target = this.getPointLabelElement(e.dragPointIdx);
+        this.toggleHighlight(target, e.type === 'dragStart');
+        this.updatePointLabel(e.dragPointIdx, e.points[e.dragPointIdx]);
         break;
       }
       default:
-        break;
+        console.warn(`Unknown event type: ${e.type}`, e);
     }
   }
 
@@ -127,9 +128,12 @@ export class Controller implements Observer {
     return this.elements.$controlPoints.children[idx] as HTMLSpanElement;
   }
 
-  private updatePointLabel(dragPointIdx: number, { x, y }: Point): void {
-    const target = this.getPointLabelElement(dragPointIdx);
-    if (target) target.textContent = `P${dragPointIdx}(${truncate(x)},${truncate(y)})`;
+  private updatePointLabel(pointIdx: number, point: Point): void {
+    const target = this.getPointLabelElement(pointIdx);
+    if (!target) return;
+
+    const [truncX, truncY] = [truncate(point.x), truncate(point.y)];
+    target.textContent = `P${pointIdx}(${truncX},${truncY})`;
   }
 
   private toggleHighlight(target: HTMLElement, shouldHighlight: boolean) {
