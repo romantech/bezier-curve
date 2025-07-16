@@ -72,11 +72,11 @@ export class Controller implements Observer {
         this.updateToggleLabel(TOGGLE_LABEL.START);
         this.toggleScale(this.elements.$progress, false);
         break;
-      case 'dragStart':
+      case 'dragMove':
       case 'dragEnd': {
         if (e.dragPointIdx === null) return;
         const target = this.getPointLabelElement(e.dragPointIdx);
-        this.toggleHighlight(target, e.type === 'dragStart');
+        this.toggleHighlight(target, e.type === 'dragMove');
         this.updatePointLabel(e.dragPointIdx, e.points[e.dragPointIdx]);
         break;
       }

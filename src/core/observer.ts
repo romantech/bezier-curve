@@ -6,7 +6,7 @@ export type BezierEventType =
   | 'pause'
   | 'setup'
   | 'tick'
-  | 'dragStart'
+  | 'dragMove'
   | 'dragEnd';
 
 export type BezierEvent = {

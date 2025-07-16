@@ -207,7 +207,7 @@ export class BezierCurve extends Publisher {
       // 드래그 중일 때: 조절점 위치 업데이트
       this.points[this.dragPointIdx] = this.clampPoint(mousePos);
       this.drawLayer('both', this.progress);
-      this.notifyEvent('dragStart');
+      this.notifyEvent('dragMove');
     } else {
       // 드래그 중이 아닐 때: 커서 아이콘 변경
       const isOverPoint = this.points.some((p) => this.isColliding(p, mousePos));
