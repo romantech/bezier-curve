@@ -1,5 +1,5 @@
 import { ACTION, type Action, CanvasRenderer, clamp, DURATION, STYLE } from '@/lib';
-import { Publisher } from './observer';
+import { type BezierEventType, Publisher } from './observer';
 
 export interface Point {
   x: number;
@@ -23,7 +23,7 @@ export class BezierCurve extends Publisher {
   private duration: number;
   private elapsedTime: number = 0;
   private animationFrameId: number | null = null;
-  private grabbedPointIndex: number | null = null;
+  private dragPointIdx: number | null = null;
 
   private readonly renderer: CanvasRenderer;
   private readonly dynamicCanvas: HTMLCanvasElement;
@@ -97,19 +97,19 @@ export class BezierCurve extends Publisher {
   public stop() {
     this._cancelAnimation();
     this.elapsedTime = 0;
-    this.notify({ type: 'stop', progress: this.progress });
+    this._notifyEvent('stop');
   }
 
   /** 애니메이션 일시정지. 다음 start() 호출 시 정지 시점부터 이어서 재생 */
   public pause() {
     this._cancelAnimation();
-    this.notify({ type: 'pause', progress: this.progress });
+    this._notifyEvent('pause');
   }
 
   public start(): void {
     if (this.animationFrameId) return;
 
-    this.notify({ type: 'start', progress: this.progress });
+    this._notifyEvent('start');
     let startTime: number | null = null;
 
     /**
@@ -127,7 +127,7 @@ export class BezierCurve extends Publisher {
       this.elapsedTime = now - startTime;
       const t = this.progress;
 
-      this.notify({ type: 'tick', progress: t });
+      this._notifyEvent('tick');
       this.drawLayer('dynamic', t); // 매 프레임마다 동적 레이어 다시 렌더링
 
       if (t < 1) this.animationFrameId = requestAnimationFrame(animate);
@@ -140,7 +140,7 @@ export class BezierCurve extends Publisher {
   public setup() {
     this.stop();
     this.drawLayer('both');
-    this.notify({ type: 'setup', progress: this.progress, points: this._normalizedPoints });
+    this._notifyEvent('setup');
   }
 
   public setPoints(newPoints: Point[]) {
@@ -162,6 +162,15 @@ export class BezierCurve extends Publisher {
     return this.duration;
   }
 
+  private _notifyEvent(type: BezierEventType): void {
+    this.notify({
+      type,
+      progress: this.progress,
+      points: this._normalizedPoints,
+      dragPointIdx: this.dragPointIdx,
+    });
+  }
+
   private _addEventListeners(): void {
     const canvas = this.dynamicCanvas;
     // 모바일에선 터치를 스크롤, 줌 같은 제스처로 처리하므로 캔버스를 드래그 가능한 영역으로 전환하기 위해 touchAction 비활성
@@ -181,7 +190,7 @@ export class BezierCurve extends Publisher {
 
     if (pointIdx !== -1) {
       this._changeCursor('grabbing');
-      this.grabbedPointIndex = pointIdx;
+      this.dragPointIdx = pointIdx;
     }
   }
 
@@ -194,10 +203,11 @@ export class BezierCurve extends Publisher {
 
     const mousePos = this._getPointerPos(e);
 
-    if (this.grabbedPointIndex !== null) {
+    if (this.dragPointIdx !== null) {
       // 드래그 중일 때: 조절점 위치 업데이트
-      this.points[this.grabbedPointIndex] = this._clampPoint(mousePos);
-      this.setup();
+      this.points[this.dragPointIdx] = this._clampPoint(mousePos);
+      this.drawLayer('both');
+      this._notifyEvent('dragStart');
     } else {
       // 드래그 중이 아닐 때: 커서 아이콘 변경
       const isOverPoint = this.points.some((p) => this._isColliding(p, mousePos));
@@ -208,9 +218,13 @@ export class BezierCurve extends Publisher {
   private _onPointerUp(): void {
     if (this.animationFrameId) return;
 
+    const wasGrabbing = this.dragPointIdx !== null;
+
     // 조절점을 드래그한 후 마우스를 놓았다면 'grab', 빈 공간을 클릭했다 놓았다면 'default' 커서
-    this._changeCursor(this.grabbedPointIndex ? 'grab' : 'default');
-    this.grabbedPointIndex = null;
+    this._changeCursor(wasGrabbing ? 'grab' : 'default');
+    if (wasGrabbing) this._notifyEvent('dragEnd');
+
+    this.dragPointIdx = null;
   }
 
   private _getPointerPos(e: PointerEvent): Point {

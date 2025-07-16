@@ -1,11 +1,19 @@
-import type { Point } from './bezier-curve';
+import type { BezierCurve, Point } from './bezier-curve';
 
-export type BezierEventType = 'start' | 'stop' | 'pause' | 'setup' | 'tick';
+export type BezierEventType =
+  | 'start'
+  | 'stop'
+  | 'pause'
+  | 'setup'
+  | 'tick'
+  | 'dragStart'
+  | 'dragEnd';
 
 export type BezierEvent = {
   type: BezierEventType;
-  progress: number;
-  points?: Point[];
+  points: Point[];
+  progress: BezierCurve['progress'];
+  dragPointIdx: BezierCurve['dragPointIdx'];
 };
 
 export interface Observer {

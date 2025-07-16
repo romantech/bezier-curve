@@ -142,9 +142,12 @@
   font-size: 12px;
   color: dimgray;
   display: grid;
-  gap: 4px;
-  max-width: 200px;
+  gap: 6px;
 
-  grid-template-columns: 1fr 1fr; /* 2개의 컬럼을 동일 비율(1:1)로 배치 */
+  grid-template-columns: repeat(2, minmax(98px, 1fr)); /* 2개의 컬럼을 동일 비율(1:1)로 배치 */
   grid-template-rows: repeat(3, 1em); /* 각 행의 높이를 1em 으로 지정하고 총 3행 생성 */
+
+  & span {
+    transition: color 0.1s ease-in-out;
+  }
 }
