@@ -1,14 +1,6 @@
 import type { BezierCurve, BezierEvent, Observer, Point } from '@/core';
-import { truncate } from '@/lib/utils.ts';
-import {
-  ACTION,
-  type Action,
-  DURATION,
-  INITIAL_CURVE,
-  SELECTORS,
-  TOGGLE_LABEL,
-  type ToggleLabel,
-} from './config';
+import { ACTION, DURATION, INITIAL_CURVE, TOGGLE_LABEL, type ToggleLabel } from './config';
+import type { Elements } from './elements';
 import { startOnboarding } from './onboard';
 import {
   type BezierCurveType,
@@ -16,49 +8,30 @@ import {
   BezierPointRatios,
   type MapPoints,
 } from './presets';
+import { truncate } from './utils';
 
-export type DefinedElements<T> = {
-  [K in keyof T]: NonNullable<T[K]>;
-};
-
-const UnsafeElements = {
-  $staticCanvas: document.querySelector<HTMLCanvasElement>(SELECTORS.STATIC_CANVAS),
-  $dynamicCanvas: document.querySelector<HTMLCanvasElement>(SELECTORS.DYNAMIC_CANVAS),
-
-  $curveLabel: document.querySelector<HTMLElement>(SELECTORS.CURVE_LABEL),
-  $curvePicker: document.querySelector<HTMLSelectElement>(SELECTORS.CURVE_PICKER),
-
-  $progress: document.querySelector<HTMLOutputElement>(SELECTORS.PROGRESS),
-  $progressValue: document.querySelector<HTMLSpanElement>(SELECTORS.PROGRESS_VALUE),
-  $controlPoints: document.querySelector<HTMLElement>(SELECTORS.CONTROL_POINTS),
-
-  $duration: document.querySelector<HTMLDivElement>(SELECTORS.DURATION_CONTAINER),
-  $durationValue: document.querySelector<HTMLSpanElement>(SELECTORS.DURATION_VALUE),
-
-  $toggleBtn: document.querySelector<HTMLButtonElement>(SELECTORS.TOGGLE_BUTTON),
-  $onboardBtn: document.querySelector<HTMLButtonElement>(SELECTORS.ONBOARD_BUTTON),
-  $decreaseBtn: document.querySelector<HTMLButtonElement>(SELECTORS.DECREASE_BUTTON),
-  $increaseBtn: document.querySelector<HTMLButtonElement>(SELECTORS.INCREASE_BUTTON),
-};
-
-type Elements = DefinedElements<typeof UnsafeElements>;
+interface ControllerDependencies {
+  bezierCurve: BezierCurve;
+  mapPoints: MapPoints;
+  elements: Elements;
+}
 
 export class Controller implements Observer {
-  public readonly elements: Elements;
+  private readonly bezierCurve: BezierCurve;
+  private readonly mapPoints: MapPoints;
+  private readonly elements: Elements;
 
-  constructor() {
-    if (Object.values(UnsafeElements).some((el) => el === null)) {
-      throw new Error('필수 HTML 요소가 존재하지 않습니다.');
-    }
-
-    this.elements = UnsafeElements as Elements;
+  constructor({ bezierCurve, mapPoints, elements }: ControllerDependencies) {
+    this.bezierCurve = bezierCurve;
+    this.mapPoints = mapPoints;
+    this.elements = elements;
   }
 
   public update(e: BezierEvent): void {
     switch (e.type) {
       case 'start':
         this.updateToggleLabel(TOGGLE_LABEL.PAUSE);
-        this.toggleScale(this.elements.$progress, true);
+        this.toggleClass(this.elements.$progress, 'scale-150', true);
         break;
       case 'tick':
         this.updateProgressValue(e.progress);
@@ -70,33 +43,37 @@ export class Controller implements Observer {
       case 'stop':
       case 'pause':
         this.updateToggleLabel(TOGGLE_LABEL.START);
-        this.toggleScale(this.elements.$progress, false);
+        this.toggleClass(this.elements.$progress, 'scale-150', false);
         break;
       case 'dragMove':
       case 'dragEnd': {
         if (e.dragPointIdx === null) return;
+
         const target = this.getPointLabelElement(e.dragPointIdx);
-        this.toggleHighlight(target, e.type === 'dragMove');
+        const isDrag = e.type === 'dragMove';
+
+        this.toggleClass(target, 'highlight', isDrag);
         this.updatePointLabel(e.dragPointIdx, e.points[e.dragPointIdx]);
         break;
       }
+      case 'durationChange':
+        this.updateDurationUI(e.duration);
+        break;
       default:
         console.warn(`Unknown event type: ${e.type}`, e);
     }
   }
 
-  public init(
-    bezierCurve: BezierCurve,
-    mapPoints: MapPoints,
-    curveTypes: readonly BezierCurveType[] = BezierCurveTypes,
-    initialCurve: BezierCurveType = INITIAL_CURVE,
-  ) {
-    this.updateCurveLabel(initialCurve);
-    this.populateCurvePicker(curveTypes, initialCurve);
-    this.updateDurationValue(DURATION.DEFAULT);
-    this.updateDurationButtonStates();
-    this.bindEvents(bezierCurve, mapPoints);
+  public init() {
+    this.updateCurveLabel(INITIAL_CURVE);
+    this.populateCurvePicker(BezierCurveTypes, INITIAL_CURVE);
+    this.updateDurationUI(this.bezierCurve.getDuration());
+    this.bindEvents();
     return this;
+  }
+
+  private toggleClass(target: HTMLElement, className: string, enabled: boolean) {
+    target.classList.toggle(className, enabled);
   }
 
   private updateCurveLabel(label: string) {
@@ -112,15 +89,11 @@ export class Controller implements Observer {
   }
 
   private renderPointLabels(points: Point[]) {
-    const labelTexts = points.map(({ x, y }, i) => `P${i}(${truncate(x)},${truncate(y)})`);
-
-    const createLabelElement = (content: string) => {
+    const labelElements = points.map(({ x, y }, i) => {
       const span = document.createElement('span');
-      span.textContent = content;
+      span.textContent = `P${i}(${truncate(x)},${truncate(y)})`;
       return span;
-    };
-
-    const labelElements = labelTexts.map(createLabelElement);
+    });
 
     this.elements.$controlPoints.replaceChildren(...labelElements);
   }
@@ -136,18 +109,11 @@ export class Controller implements Observer {
     target.textContent = `P${pointIdx}(${truncX},${truncY})`;
   }
 
-  private toggleHighlight(target: HTMLElement, shouldHighlight: boolean) {
-    target.classList.toggle('highlight', shouldHighlight);
-  }
-
-  private toggleScale(target: HTMLElement, shouldScale: boolean) {
-    target.classList.toggle('scale-150', shouldScale);
-  }
-
   private populateCurvePicker(
     curveTypes: readonly BezierCurveType[],
     initialCurve: BezierCurveType,
   ) {
+    this.elements.$curvePicker.options.length = 0; // 기존 옵션 제거
     const initialKeyIdx = Math.max(0, curveTypes.indexOf(initialCurve));
 
     curveTypes.forEach((curve, i) => {
@@ -157,49 +123,36 @@ export class Controller implements Observer {
     });
   }
 
-  private bindEvents(bezierCurve: BezierCurve, mapPoints: MapPoints) {
+  private bindEvents() {
     const { $toggleBtn, $curvePicker, $duration, $onboardBtn } = this.elements;
 
-    $toggleBtn.addEventListener('click', bezierCurve.togglePlayPause.bind(bezierCurve));
+    $toggleBtn.addEventListener('click', () => this.bezierCurve.togglePlayPause());
     $onboardBtn.addEventListener('click', () => startOnboarding(true));
 
     $curvePicker.addEventListener('change', (e) => {
-      const selected = (e.target as HTMLSelectElement).value as BezierCurveType;
-      const controlPoints = mapPoints(BezierPointRatios[selected]);
+      const curve = (e.target as HTMLSelectElement).value as BezierCurveType;
+      const controlPoints = this.mapPoints(BezierPointRatios[curve]);
 
-      this.updateCurveLabel(selected);
-      bezierCurve.setPoints(controlPoints).setup();
+      this.updateCurveLabel(curve);
+      this.bezierCurve.setPoints(controlPoints).setup();
     });
 
     $duration.addEventListener('click', (e) => {
       const btn = (e.target as HTMLElement).closest('button');
       if (!btn) return;
+
       const action = btn.dataset.action;
       if (action !== ACTION.INCREASE && action !== ACTION.DECREASE) return;
 
-      this.handleDurationChange(bezierCurve, action);
+      this.bezierCurve.changeDuration(action);
     });
   }
 
-  private handleDurationChange(bezierCurve: BezierCurve, action: Action) {
-    const newDuration = bezierCurve.changeDuration(action);
-    this.updateDurationValue(newDuration);
-    this.updateDurationButtonStates();
-  }
-
-  private updateDurationValue(duration: number) {
+  private updateDurationUI(duration: number): void {
     this.elements.$durationValue.textContent = `${Math.trunc(duration / 1000)}`;
-    this.elements.$durationValue.dataset.value = `${duration}`;
-  }
 
-  private updateDurationButtonStates() {
-    const { $durationValue, $decreaseBtn, $increaseBtn } = this.elements;
-
-    const ms = parseInt($durationValue.dataset.value ?? `${DURATION.DEFAULT}`, 10);
-    $decreaseBtn.disabled = ms <= DURATION.MIN;
-    $increaseBtn.disabled = ms >= DURATION.MAX;
+    const { $decreaseBtn, $increaseBtn } = this.elements;
+    $decreaseBtn.disabled = duration <= DURATION.MIN;
+    $increaseBtn.disabled = duration >= DURATION.MAX;
   }
 }
-
-/** 싱글턴(단일 인스턴스)으로 사용 */
-export const controller = new Controller();
