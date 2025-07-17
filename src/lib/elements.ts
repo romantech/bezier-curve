@@ -26,7 +26,7 @@ export function getElements() {
   };
 
   const hasMissingElement = Object.values(elements).some((el) => el === null);
-  if (hasMissingElement) throw new Error('필수 HTML 요소를 찾을 수 없습니다.');
+  if (hasMissingElement) throw new Error('Required HTML elements not found.');
 
   return elements as DefinedElements<typeof elements>;
 }
