@@ -1,12 +1,5 @@
 import type { BezierCurve, BezierEvent, Observer, Point } from '@/core';
-import {
-  ACTION,
-  type Action,
-  DURATION,
-  INITIAL_CURVE,
-  TOGGLE_LABEL,
-  type ToggleLabel,
-} from './config';
+import { ACTION, DURATION, INITIAL_CURVE, TOGGLE_LABEL, type ToggleLabel } from './config';
 import type { Elements } from './elements';
 import { startOnboarding } from './onboard';
 import {
@@ -27,7 +20,6 @@ export class Controller implements Observer {
   private readonly bezierCurve: BezierCurve;
   private readonly mapPoints: MapPoints;
   private readonly elements: Elements;
-  private duration: number = DURATION.DEFAULT;
 
   constructor({ bezierCurve, mapPoints, elements }: ControllerDependencies) {
     this.bezierCurve = bezierCurve;
@@ -64,6 +56,9 @@ export class Controller implements Observer {
         this.updatePointLabel(e.dragPointIdx, e.points[e.dragPointIdx]);
         break;
       }
+      case 'durationChange':
+        this.updateDurationUI(e.duration);
+        break;
       default:
         console.warn(`Unknown event type: ${e.type}`, e);
     }
@@ -72,8 +67,7 @@ export class Controller implements Observer {
   public init() {
     this.updateCurveLabel(INITIAL_CURVE);
     this.populateCurvePicker(BezierCurveTypes, INITIAL_CURVE);
-    this.updateDurationLabel();
-    this.updateDurationButtonStates();
+    this.updateDurationUI(this.bezierCurve.getDuration());
     this.bindEvents();
     return this;
   }
@@ -150,24 +144,15 @@ export class Controller implements Observer {
       const action = btn.dataset.action;
       if (action !== ACTION.INCREASE && action !== ACTION.DECREASE) return;
 
-      this.handleDurationChange(action);
+      this.bezierCurve.changeDuration(action);
     });
   }
 
-  private handleDurationChange(action: Action) {
-    this.duration = this.bezierCurve.changeDuration(action);
-    this.updateDurationLabel();
-    this.updateDurationButtonStates();
-  }
+  private updateDurationUI(duration: number): void {
+    this.elements.$durationValue.textContent = `${Math.trunc(duration / 1000)}`;
 
-  private updateDurationLabel(): void {
-    this.elements.$durationValue.textContent = `${Math.trunc(this.duration / 1000)}`;
-  }
-
-  private updateDurationButtonStates() {
     const { $decreaseBtn, $increaseBtn } = this.elements;
-
-    $decreaseBtn.disabled = this.duration <= DURATION.MIN;
-    $increaseBtn.disabled = this.duration >= DURATION.MAX;
+    $decreaseBtn.disabled = duration <= DURATION.MIN;
+    $increaseBtn.disabled = duration >= DURATION.MAX;
   }
 }

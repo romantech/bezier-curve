@@ -7,13 +7,15 @@ export type BezierEventType =
   | 'setup'
   | 'tick'
   | 'dragMove'
-  | 'dragEnd';
+  | 'dragEnd'
+  | 'durationChange';
 
 export type BezierEvent = {
   type: BezierEventType;
   points: Point[];
   progress: BezierCurve['progress'];
   dragPointIdx: BezierCurve['dragPointIdx'];
+  duration: BezierCurve['duration'];
 };
 
 export interface Observer {

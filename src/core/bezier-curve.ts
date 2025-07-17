@@ -82,6 +82,10 @@ export class BezierCurve extends Publisher {
     }));
   }
 
+  public getDuration(): number {
+    return this.duration;
+  }
+
   public drawLayer(type: 'static' | 'dynamic' | 'both', t = 0) {
     const isBoth = type === 'both';
     if (type === 'static' || isBoth) this.renderer.drawStaticLayer(this.points);
@@ -159,7 +163,7 @@ export class BezierCurve extends Publisher {
   public changeDuration(action: Action) {
     const delta = action === ACTION.INCREASE ? DURATION.STEP : -DURATION.STEP;
     this.duration = this.clampDuration(delta + this.duration);
-    return this.duration;
+    this.notifyEvent('durationChange');
   }
 
   private notifyEvent(type: BezierEventType): void {
@@ -168,6 +172,7 @@ export class BezierCurve extends Publisher {
       progress: this.progress,
       points: this.normalizedPoints,
       dragPointIdx: this.dragPointIdx,
+      duration: this.duration,
     });
   }
 
