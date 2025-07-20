@@ -1,4 +1,4 @@
-# Understanding Bézier Curves
+# Understanding Bézier Curve
 
 > 베지에 곡선 원리 한국어로 읽기: https://romantech.net/1330  
 > Bezier Curve Animation Demo: https://romantech.github.io/bezier-curve
