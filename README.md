@@ -29,7 +29,7 @@ ease-in-out    /* cubic-bezier(0.42, 0, 0.58, 1) */
 
 A Bézier curve is a mathematical curve used in computer graphics to represent smooth curves, defined by a set of points called control points. Given `n` control points, a Bézier curve of degree `n-1` can be created. Image via [JavaScript Info](https://javascript.info/bezier-curve#control-points).
 
-![bezier-curves.png](/public/images/bezier-curves.png)
+![bezier-curves.png](/public/docs/bezier-curves.png)
 
 The [cubic-bezier()](https://developer.mozilla.org/en-US/docs/Web/CSS/easing-function/cubic-bezier) function used in CSS is based on a cubic (3rd-degree) Bézier curve, which consists of four control points ($P_0, P_1, P_2, P_3$). Among these, the starting point ($P_0$) and the ending point ($P_3$) are always fixed at (0, 0) and (1, 1), respectively. Therefore, in practice, you only set the two intermediate control points, $P_1$ and $P_2$, directly.
 
@@ -63,27 +63,27 @@ Linear interpolation is the most representative and simple of these interpolatio
 
 First, connect the three control points `A`, `B`, and `C` with straight lines. This creates two line segments: `AB` and `BC`.
 
-![quadratic-bezier-curve-01.png](/public/images/quadratic-bezier-curve-01.png)
+![quadratic-bezier-curve-01.png](/public/docs/quadratic-bezier-curve-01.png)
 
 Divide each line segment by the same ratio `t` (where $0 \le t \le 1$). For example, if `t` is 0.3, a point `D` is formed 30% of the way from `A` to `B`, and a point `E` is formed 30% of the way from `B` to `C`.
 
-![quadratic-bezier-curve-02.png](/public/images/quadratic-bezier-curve-02.png)
+![quadratic-bezier-curve-02.png](/public/docs/quadratic-bezier-curve-02.png)
 
 Connect points `D` and `E` with a straight line to create a new line segment `DE`.
 
-![quadratic-bezier-curve-03.png](/public/images/quadratic-bezier-curve-03.png)
+![quadratic-bezier-curve-03.png](/public/docs/quadratic-bezier-curve-03.png)
 
 On this new segment, find point `F` by moving along it by the same ratio `t`. Since `F` is the only point remaining, this point becomes a coordinate on the Bézier curve.
 
-![quadratic-bezier-curve-04.png](/public/images/quadratic-bezier-curve-04.png)
+![quadratic-bezier-curve-04.png](/public/docs/quadratic-bezier-curve-04.png)
 
 By repeating the process above while gradually increasing the `t` value from 0 to 1 (e.g., 0.05, 0.1, ..., 0.95, 1), multiple points are generated. Connecting these points in order completes the quadratic Bézier curve.
 
-![quadratic-bezier-curve-05.png](/public/images/quadratic-bezier-curve-05.png)
+![quadratic-bezier-curve-05.png](/public/docs/quadratic-bezier-curve-05.png)
 
 Let's see how a quadratic Bézier curve is drawn through the GIF image below.
 
-![Quadratic Bézier Curve Animation](/public/images/quadratic-bezier-curves-animation.gif)
+![Quadratic Bézier Curve Animation](/public/docs/quadratic-bezier-curves-animation.gif)
 
 ## Cubic Bézier Curve
 
@@ -91,31 +91,31 @@ A cubic Bézier curve consists of four control points. The basic principle of cr
 
 First, connect the four control points `A`, `B`, `C`, and `D` with straight lines.
 
-![cubic-bezier-curve-01.png](/public/images/cubic-bezier-curve-01.png)
+![cubic-bezier-curve-01.png](/public/docs/cubic-bezier-curve-01.png)
 
 Divide each of the line segments `AB`, `BC`, and `CD` by the same ratio `t`.
 
-![cubic-bezier-curve-02.png](/public/images/cubic-bezier-curve-02.png)
+![cubic-bezier-curve-02.png](/public/docs/cubic-bezier-curve-02.png)
 
 Connect the resulting points `E`, `F`, and `G` to form new line segments `EF` and `FG`.
 
-![cubic-bezier-curve-03.png](/public/images/cubic-bezier-curve-03.png)
+![cubic-bezier-curve-03.png](/public/docs/cubic-bezier-curve-03.png)
 
 Again, divide the new line segments by `t` to create points `H` and `I`.
 
-![cubic-bezier-curve-04.png](/public/images/cubic-bezier-curve-04.png)
+![cubic-bezier-curve-04.png](/public/docs/cubic-bezier-curve-04.png)
 
 Connect the resulting points with a straight line to create the segment `HI`.
 
-![cubic-bezier-curve-05.png](/public/images/cubic-bezier-curve-05.png)
+![cubic-bezier-curve-05.png](/public/docs/cubic-bezier-curve-05.png)
 
 Divide the segment again by the ratio `t` to find point `J`. Since only one point remains, this point becomes a coordinate on the Bézier curve.
 
-![cubic-bezier-curve-06.png](/public/images/cubic-bezier-curve-06.png)
+![cubic-bezier-curve-06.png](/public/docs/cubic-bezier-curve-06.png)
 
 Let's see how a cubic Bézier curve is drawn through the GIF image below.
 
-![Cubic Bézier Curve Animation](/public/images/cubic-bezier-curves-animation.gif)
+![Cubic Bézier Curve Animation](/public/docs/cubic-bezier-curves-animation.gif)
 
 ## Understanding the Bézier Curve's Mathematical Formula
 
@@ -228,11 +228,11 @@ For reference, terms like $(1-t)^2$, $2(1-t)t$, and $t^2$ that are multiplied in
 
 Below are examples of various Bézier curves. Image via [Josh Collins Worth](https://joshcollinsworth.com/demos/easing).
 
-![Easing Examples](/public/images/easing-example.gif)
+![Easing Examples](/public/docs/easing-example.gif)
 
 In a Bézier curve graph, the x-axis represents the flow of time (duration), and the y-axis represents the progress of the animation. In this context, the slope of the curve represents the velocity at that moment. Therefore, a steeper slope can create the effect of faster movement, while a gentler slope results in slower movement. Image via [Josh Collins Worth](https://joshcollinsworth.com/blog/easing-curves).
 
-![Curve Illustrated](/public/images/curve-illustrated.png)
+![Curve Illustrated](/public/docs/curve-illustrated.png)
 
 While the x-axis must always be specified within the 0 to 1 range, as it represents the total animation duration normalized to 1, the y-axis can be used to create a bounce effect by utilizing a pattern that overshoots the target value of 1 and then returns.
 
