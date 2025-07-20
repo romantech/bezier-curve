@@ -11,6 +11,12 @@
   "bugs": {
     "url": "https://github.com/romantech/bezier-curve/issues"
   },
+  "author": {
+    "name": "romantech",
+    "email": "johan@romantech.net",
+    "url": "https://github.com/romantech"
+  },
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
