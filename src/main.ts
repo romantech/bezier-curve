@@ -1,3 +1,7 @@
+import './styles/global.css';
+import './styles/main.css';
+import './styles/driver.css';
+
 import { BezierCurve } from '@/core';
 import {
   BezierPointRatios,
