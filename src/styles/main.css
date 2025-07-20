@@ -61,7 +61,7 @@
   border: 1px solid var(--border-light); /* 은은한 테두리 */
 
   /* 커스텀 드롭다운 화살표 (SVG 인코딩) */
-  background-image: url("/public/chevron-down.svg");
+  background-image: url("/public/icons/chevron-down.svg");
   background-repeat: no-repeat;
   background-position: right 10px center;
   background-size: 1.1rem;

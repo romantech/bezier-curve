@@ -1,8 +1,22 @@
 {
   "name": "bezier-curve",
-  "private": true,
-  "version": "0.0.0",
+  "private": false,
+  "version": "1.3.4",
   "type": "module",
+  "homepage": "https://romantech.github.io/bezier-curve",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/romantech/bezier-curve.git"
+  },
+  "bugs": {
+    "url": "https://github.com/romantech/bezier-curve/issues"
+  },
+  "author": {
+    "name": "romantech",
+    "email": "johan@romantech.net",
+    "url": "https://github.com/romantech"
+  },
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
