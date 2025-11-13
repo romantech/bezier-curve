@@ -23,6 +23,10 @@ export function getElements() {
     $onboardBtn: document.querySelector<HTMLButtonElement>(SELECTORS.ONBOARD_BUTTON),
     $decreaseBtn: document.querySelector<HTMLButtonElement>(SELECTORS.DECREASE_BUTTON),
     $increaseBtn: document.querySelector<HTMLButtonElement>(SELECTORS.INCREASE_BUTTON),
+
+    $cssOutputContainer: document.querySelector<HTMLDivElement>(SELECTORS.CSS_OUTPUT_CONTAINER),
+    $cssOutput: document.querySelector<HTMLElement>(SELECTORS.CSS_OUTPUT),
+    $cssCopiedIndicator: document.querySelector<HTMLSpanElement>(SELECTORS.CSS_COPIED_INDICATOR),
   };
 
   const hasMissingElement = Object.values(elements).some((el) => el === null);
