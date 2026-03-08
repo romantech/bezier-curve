@@ -7,6 +7,22 @@ const CLASS_ONBOARD_THEME = 'onboard-theme';
 
 let onboardDriver: Driver | null = null;
 
+const safeSetOnboarded = () => {
+  try {
+    localStorage.setItem(STORAGE_KEY_ONBOARDED, 'true');
+  } catch {
+    // Storage 접근 불가 환경(privacy mode 등)에서는 조용히 무시
+  }
+};
+
+const safeGetOnboarded = () => {
+  try {
+    return localStorage.getItem(STORAGE_KEY_ONBOARDED);
+  } catch {
+    return null;
+  }
+};
+
 const getDriverInstance = () => {
   if (onboardDriver) return onboardDriver;
 
@@ -14,7 +30,7 @@ const getDriverInstance = () => {
     showProgress: true,
     overlayOpacity: 0.5,
     popoverClass: CLASS_ONBOARD_THEME,
-    onDestroyed: () => localStorage.setItem(STORAGE_KEY_ONBOARDED, 'true'),
+    onDestroyed: safeSetOnboarded,
     steps: [
       {
         element: SELECTORS.CANVAS_CONTAINER,
@@ -72,6 +88,6 @@ export const startOnboarding = (force: boolean = false) => {
   const isInFrame = window.self !== window.top;
   if (isInFrame) return;
 
-  const hasSeenOnboarding = localStorage.getItem(STORAGE_KEY_ONBOARDED);
+  const hasSeenOnboarding = safeGetOnboarded();
   if (!hasSeenOnboarding) getDriverInstance().drive();
 };

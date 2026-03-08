@@ -22,6 +22,21 @@
 
     <link href="/favicon-64.png" rel="icon" type="image/png" />
     <link href="/favicon-1024.png" rel="apple-touch-icon" sizes="1024x1024" />
+    <link href="/src/styles/global.css" rel="stylesheet" />
+    <link href="/src/styles/main.css" rel="stylesheet" />
+    <link href="/src/styles/driver.css" rel="stylesheet" />
+    <style>
+      /* Prevent white flash before bundled CSS loads */
+      :root {
+        color-scheme: dark;
+      }
+
+      body {
+        margin: 0;
+        background-color: var(--bg-main, #131417);
+        color: var(--text-light, white);
+      }
+    </style>
   </head>
   <body>
     <main id="app">
@@ -62,8 +77,8 @@
       </div>
       <code class="control-points"></code>
       <div class="css-output-container">
-        <span class="css-copied-indicator">Copied!</span>
-        <code class="css-output" contenteditable="false"></code>
+        <span aria-live="polite" class="css-copied-indicator" role="status"></span>
+        <code aria-label="Copy cubic-bezier value" class="css-output" role="button" tabindex="0"></code>
       </div>
     </main>
     <!-- type="module" 은 기본적으로 defer 속성을 적용한 것과 동일하게 동작 -->

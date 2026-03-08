@@ -153,8 +153,7 @@
 }
 
 .css-output-container {
-  padding-top: 8px;
-  width: 348px;
+  width: min(100%, 348px);
   position: relative;
 }
 
@@ -174,11 +173,17 @@
   &:hover {
     background-color: var(--button-hover);
   }
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
 }
 
 .css-copied-indicator {
   display: block;
   font-size: 12px;
+  line-height: 1.2;
+  min-height: calc(12px * 1.2);
   color: var(--accent);
   opacity: 0;
   transition: opacity 300ms;

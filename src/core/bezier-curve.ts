@@ -98,10 +98,11 @@ export class BezierCurve extends Publisher {
   }
 
   /** 애니메이션 정지. 다음 start() 호출 시 처음부터 시작 */
-  public stop() {
+  public stop({ resetBeforeNotify = true }: { resetBeforeNotify?: boolean } = {}) {
     this.cancelAnimation();
-    this.elapsedTime = 0;
+    if (resetBeforeNotify) this.elapsedTime = 0;
     this.notifyEvent('stop');
+    if (!resetBeforeNotify) this.elapsedTime = 0;
   }
 
   /** 애니메이션 일시정지. 다음 start() 호출 시 정지 시점부터 이어서 재생 */
@@ -126,7 +127,7 @@ export class BezierCurve extends Publisher {
        * 이후 애니메이션 재개 시, startTime을 '현재시간(now) - 경과시간(2000)'으로 보정하여
        * 다음 프레임의 경과 시간이 2000부터 시작되도록 만듦.
        */
-      if (!startTime) startTime = now - this.elapsedTime;
+      if (startTime === null) startTime = now - this.elapsedTime;
 
       this.elapsedTime = now - startTime;
       const t = this.progress;
@@ -135,7 +136,7 @@ export class BezierCurve extends Publisher {
       this.drawLayer('dynamic', t); // 매 프레임마다 동적 레이어 다시 렌더링
 
       if (t < 1) this.animationFrameId = requestAnimationFrame(animate);
-      else this.stop();
+      else this.stop({ resetBeforeNotify: false });
     };
 
     this.animationFrameId = requestAnimationFrame(animate);
@@ -185,6 +186,7 @@ export class BezierCurve extends Publisher {
     canvas.addEventListener('pointermove', this.onPointerMove.bind(this));
     canvas.addEventListener('pointerup', this.onPointerUp.bind(this));
     canvas.addEventListener('pointerleave', this.onPointerUp.bind(this));
+    canvas.addEventListener('pointercancel', this.onPointerUp.bind(this));
   }
 
   private onPointerDown(e: PointerEvent): void {
@@ -234,12 +236,16 @@ export class BezierCurve extends Publisher {
 
   private getPointerPos(e: PointerEvent): Point {
     const rect = this.dynamicCanvas.getBoundingClientRect();
+    const scaleX = rect.width > 0 ? this.width / rect.width : 1;
+    const scaleY = rect.height > 0 ? this.height / rect.height : 1;
+
     return {
       // e.clientX: 화면 왼쪽 최상단부터 이벤트가 발생한 지점까지의 거리
       // rect.left: 화면 좌측부터 해당 엘리먼트의 왼쪽 변까지의 거리
       // e.clientX - rect.left: 해당 엘리먼트의 왼쪽부터 이벤트가 발생한 지점까지의 거리
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+      // 캔버스 표시 크기와 내부 좌표계 크기가 달라질 수 있으므로 좌표를 내부 기준으로 보정
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top) * scaleY,
     };
   }
 
