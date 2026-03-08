@@ -98,10 +98,11 @@ export class BezierCurve extends Publisher {
   }
 
   /** 애니메이션 정지. 다음 start() 호출 시 처음부터 시작 */
-  public stop() {
+  public stop({ resetBeforeNotify = true }: { resetBeforeNotify?: boolean } = {}) {
     this.cancelAnimation();
-    this.elapsedTime = 0;
+    if (resetBeforeNotify) this.elapsedTime = 0;
     this.notifyEvent('stop');
+    if (!resetBeforeNotify) this.elapsedTime = 0;
   }
 
   /** 애니메이션 일시정지. 다음 start() 호출 시 정지 시점부터 이어서 재생 */
@@ -135,7 +136,7 @@ export class BezierCurve extends Publisher {
       this.drawLayer('dynamic', t); // 매 프레임마다 동적 레이어 다시 렌더링
 
       if (t < 1) this.animationFrameId = requestAnimationFrame(animate);
-      else this.stop();
+      else this.stop({ resetBeforeNotify: false });
     };
 
     this.animationFrameId = requestAnimationFrame(animate);
