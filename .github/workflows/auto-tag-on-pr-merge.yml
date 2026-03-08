@@ -25,6 +25,8 @@ jobs:
       - name: Validate signing secrets
         env:
           TAG_SIGNING_GPG_PRIVATE_KEY: ${{ secrets.TAG_SIGNING_GPG_PRIVATE_KEY }}
+          TAG_SIGNING_GPG_PASSPHRASE: ${{ secrets.TAG_SIGNING_GPG_PASSPHRASE }}
+          TAG_SIGNING_PASSPHRASE_REQUIRED: ${{ vars.TAG_SIGNING_PASSPHRASE_REQUIRED }}
           TAG_SIGNING_NAME: ${{ secrets.TAG_SIGNING_NAME }}
           TAG_SIGNING_EMAIL: ${{ secrets.TAG_SIGNING_EMAIL }}
         run: |
@@ -43,6 +45,15 @@ jobs:
           if [[ -z "${TAG_SIGNING_EMAIL:-}" ]]; then
             echo "Missing secret: TAG_SIGNING_EMAIL"
             exit 1
+          fi
+
+          passphrase_required="${TAG_SIGNING_PASSPHRASE_REQUIRED:-false}"
+          passphrase_required="$(echo "${passphrase_required}" | tr '[:upper:]' '[:lower:]')"
+          if [[ "${passphrase_required}" == "1" || "${passphrase_required}" == "true" || "${passphrase_required}" == "yes" ]]; then
+            if [[ -z "${TAG_SIGNING_GPG_PASSPHRASE:-}" ]]; then
+              echo "Missing secret: TAG_SIGNING_GPG_PASSPHRASE (required because TAG_SIGNING_PASSPHRASE_REQUIRED is enabled)"
+              exit 1
+            fi
           fi
 
       - name: Import GPG key
@@ -104,7 +115,10 @@ jobs:
           git config user.name "${TAG_SIGNING_NAME}"
           git config user.email "${TAG_SIGNING_EMAIL}"
 
-          git tag -s "${next_tag}" "${target_sha}" -m "${next_tag}"
+          if ! git tag -s "${next_tag}" "${target_sha}" -m "${next_tag}"; then
+            echo "Failed to create a signed tag. If your key has a passphrase, set TAG_SIGNING_GPG_PASSPHRASE."
+            exit 1
+          fi
           git push origin "${next_tag}"
           echo "tag_created=true" >> "${GITHUB_OUTPUT}"
 
