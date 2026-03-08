@@ -234,12 +234,16 @@ export class BezierCurve extends Publisher {
 
   private getPointerPos(e: PointerEvent): Point {
     const rect = this.dynamicCanvas.getBoundingClientRect();
+    const scaleX = rect.width > 0 ? this.width / rect.width : 1;
+    const scaleY = rect.height > 0 ? this.height / rect.height : 1;
+
     return {
       // e.clientX: 화면 왼쪽 최상단부터 이벤트가 발생한 지점까지의 거리
       // rect.left: 화면 좌측부터 해당 엘리먼트의 왼쪽 변까지의 거리
       // e.clientX - rect.left: 해당 엘리먼트의 왼쪽부터 이벤트가 발생한 지점까지의 거리
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+      // 캔버스 표시 크기와 내부 좌표계 크기가 달라질 수 있으므로 좌표를 내부 기준으로 보정
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top) * scaleY,
     };
   }
 

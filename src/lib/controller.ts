@@ -21,6 +21,7 @@ export class Controller implements Observer {
   private readonly mapPoints: MapPoints;
   private readonly elements: Elements;
   private currentCurveType: BezierCurveType = INITIAL_CURVE;
+  private copyStatusTimeoutId: number | null = null;
 
   constructor({ bezierCurve, mapPoints, elements }: ControllerDependencies) {
     this.bezierCurve = bezierCurve;
@@ -43,6 +44,10 @@ export class Controller implements Observer {
         this.updateCssOutput(e.points);
         break;
       case 'stop':
+        this.updateProgressValue(e.progress);
+        this.updateToggleLabel(TOGGLE_LABEL.START);
+        this.toggleClass(this.elements.$progress, 'scale-150', false);
+        break;
       case 'pause':
         this.updateToggleLabel(TOGGLE_LABEL.START);
         this.toggleClass(this.elements.$progress, 'scale-150', false);
@@ -153,27 +158,22 @@ export class Controller implements Observer {
       this.bezierCurve.changeDuration(action);
     });
 
-    $cssOutput.addEventListener('click', async () => {
+    const copyCssOutput = async () => {
       const text = $cssOutput.textContent;
       if (!text || !text.startsWith('cubic-bezier')) return;
 
-      try {
-        await navigator.clipboard.writeText(text);
-      } catch {
-        // Fallback
-        const textArea = document.createElement('textarea');
-        textArea.value = text;
-        textArea.style.position = 'fixed';
-        textArea.style.opacity = '0';
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-      }
+      const copied = await this.copyTextToClipboard(text);
+      this.showCopyStatus(copied ? 'Copied!' : 'Copy failed', copied);
+    };
 
-      const indicator = this.elements.$cssCopiedIndicator;
-      indicator.style.opacity = '1';
-      setTimeout(() => (indicator.style.opacity = '0'), 2000);
+    $cssOutput.addEventListener('click', () => {
+      void copyCssOutput();
+    });
+
+    $cssOutput.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      void copyCssOutput();
     });
   }
 
@@ -207,5 +207,65 @@ export class Controller implements Observer {
     } catch {
       this.elements.$cssOutput.textContent = '';
     }
+  }
+
+  private async copyTextToClipboard(text: string): Promise<boolean> {
+    if (navigator.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch {
+        // no-op: fallback copy path is handled below
+      }
+    }
+
+    return this.copyTextToClipboardFallback(text);
+  }
+
+  private copyTextToClipboardFallback(text: string): boolean {
+    if (typeof document.execCommand !== 'function') return false;
+
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.setAttribute('readonly', '');
+    textArea.style.position = 'fixed';
+    textArea.style.left = '0';
+    textArea.style.top = '0';
+    textArea.style.opacity = '0';
+
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    textArea.setSelectionRange(0, textArea.value.length);
+
+    try {
+      return document.execCommand('copy');
+    } catch {
+      return false;
+    } finally {
+      textArea.remove();
+    }
+  }
+
+  private showCopyStatus(message: string, isSuccess: boolean): void {
+    const indicator = this.elements.$cssCopiedIndicator;
+
+    if (this.copyStatusTimeoutId !== null) {
+      window.clearTimeout(this.copyStatusTimeoutId);
+      this.copyStatusTimeoutId = null;
+    }
+
+    indicator.style.opacity = '0';
+    indicator.textContent = '';
+    indicator.style.color = isSuccess ? 'var(--accent)' : 'var(--text-light)';
+
+    window.requestAnimationFrame(() => {
+      indicator.textContent = message;
+      indicator.style.opacity = '1';
+      this.copyStatusTimeoutId = window.setTimeout(() => {
+        indicator.style.opacity = '0';
+        this.copyStatusTimeoutId = null;
+      }, 2000);
+    });
   }
 }
