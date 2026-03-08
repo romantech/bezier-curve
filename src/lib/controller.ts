@@ -16,6 +16,8 @@ interface ControllerDependencies {
   elements: Elements;
 }
 
+type CopyStatus = 'copied' | 'manual' | 'failed';
+
 export class Controller implements Observer {
   private readonly bezierCurve: BezierCurve;
   private readonly mapPoints: MapPoints;
@@ -162,8 +164,14 @@ export class Controller implements Observer {
       const text = $cssOutput.textContent;
       if (!text || !text.startsWith('cubic-bezier')) return;
 
-      const copied = await this.copyTextToClipboard(text);
-      this.showCopyStatus(copied ? 'Copied!' : 'Copy failed', copied);
+      const copyStatus = await this.copyTextToClipboard(text);
+      if (copyStatus === 'copied') {
+        this.showCopyStatus('Copied!', true);
+      } else if (copyStatus === 'manual') {
+        this.showCopyStatus('Press Ctrl/Cmd+C', false);
+      } else {
+        this.showCopyStatus('Copy failed', false);
+      }
     };
 
     $cssOutput.addEventListener('click', () => {
@@ -209,41 +217,31 @@ export class Controller implements Observer {
     }
   }
 
-  private async copyTextToClipboard(text: string): Promise<boolean> {
+  private async copyTextToClipboard(text: string): Promise<CopyStatus> {
     if (navigator.clipboard?.writeText) {
       try {
         await navigator.clipboard.writeText(text);
-        return true;
+        return 'copied';
       } catch {
-        // no-op: fallback copy path is handled below
+        // no-op: manual fallback is handled below
       }
     }
 
-    return this.copyTextToClipboardFallback(text);
+    return this.selectCssOutputText() ? 'manual' : 'failed';
   }
 
-  private copyTextToClipboardFallback(text: string): boolean {
-    if (typeof document.execCommand !== 'function') return false;
+  private selectCssOutputText(): boolean {
+    const selection = window.getSelection();
+    if (!selection) return false;
 
-    const textArea = document.createElement('textarea');
-    textArea.value = text;
-    textArea.setAttribute('readonly', '');
-    textArea.style.position = 'fixed';
-    textArea.style.left = '0';
-    textArea.style.top = '0';
-    textArea.style.opacity = '0';
-
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-    textArea.setSelectionRange(0, textArea.value.length);
-
+    const range = document.createRange();
     try {
-      return document.execCommand('copy');
+      range.selectNodeContents(this.elements.$cssOutput);
+      selection.removeAllRanges();
+      selection.addRange(range);
+      return true;
     } catch {
       return false;
-    } finally {
-      textArea.remove();
     }
   }
 
