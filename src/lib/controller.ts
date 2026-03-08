@@ -8,7 +8,7 @@ import {
   BezierPointRatios,
   type MapPoints,
 } from './presets';
-import { truncate } from './utils';
+import { toCssCubicBezier, truncate } from './utils';
 
 interface ControllerDependencies {
   bezierCurve: BezierCurve;
@@ -20,6 +20,7 @@ export class Controller implements Observer {
   private readonly bezierCurve: BezierCurve;
   private readonly mapPoints: MapPoints;
   private readonly elements: Elements;
+  private currentCurveType: BezierCurveType = INITIAL_CURVE;
 
   constructor({ bezierCurve, mapPoints, elements }: ControllerDependencies) {
     this.bezierCurve = bezierCurve;
@@ -39,6 +40,7 @@ export class Controller implements Observer {
       case 'setup':
         this.updateProgressValue(e.progress);
         this.renderPointLabels(e.points);
+        this.updateCssOutput(e.points);
         break;
       case 'stop':
       case 'pause':
@@ -54,6 +56,7 @@ export class Controller implements Observer {
 
         this.toggleClass(target, 'highlight', isDrag);
         this.updatePointLabel(e.dragPointIdx, e.points[e.dragPointIdx]);
+        this.updateCssOutput(e.points);
         break;
       }
       case 'durationChange':
@@ -68,6 +71,7 @@ export class Controller implements Observer {
     this.updateCurveLabel(INITIAL_CURVE);
     this.populateCurvePicker(BezierCurveTypes, INITIAL_CURVE);
     this.updateDurationUI(this.bezierCurve.getDuration());
+    this.updateCssOutputVisibility(INITIAL_CURVE);
     this.bindEvents();
     return this;
   }
@@ -124,7 +128,7 @@ export class Controller implements Observer {
   }
 
   private bindEvents() {
-    const { $toggleBtn, $curvePicker, $duration, $onboardBtn } = this.elements;
+    const { $toggleBtn, $curvePicker, $duration, $onboardBtn, $cssOutput } = this.elements;
 
     $toggleBtn.addEventListener('click', () => this.bezierCurve.togglePlayPause());
     $onboardBtn.addEventListener('click', () => startOnboarding(true));
@@ -133,7 +137,9 @@ export class Controller implements Observer {
       const curve = (e.target as HTMLSelectElement).value as BezierCurveType;
       const controlPoints = this.mapPoints(BezierPointRatios[curve]);
 
+      this.currentCurveType = curve;
       this.updateCurveLabel(curve);
+      this.updateCssOutputVisibility(curve);
       this.bezierCurve.setPoints(controlPoints).setup();
     });
 
@@ -146,6 +152,29 @@ export class Controller implements Observer {
 
       this.bezierCurve.changeDuration(action);
     });
+
+    $cssOutput.addEventListener('click', async () => {
+      const text = $cssOutput.textContent;
+      if (!text || !text.startsWith('cubic-bezier')) return;
+
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        // Fallback
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.opacity = '0';
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+      }
+
+      const indicator = this.elements.$cssCopiedIndicator;
+      indicator.style.opacity = '1';
+      setTimeout(() => (indicator.style.opacity = '0'), 2000);
+    });
   }
 
   private updateDurationUI(duration: number): void {
@@ -154,5 +183,29 @@ export class Controller implements Observer {
     const { $decreaseBtn, $increaseBtn } = this.elements;
     $decreaseBtn.disabled = duration <= DURATION.MIN;
     $increaseBtn.disabled = duration >= DURATION.MAX;
+  }
+
+  private updateCssOutputVisibility(curveType: BezierCurveType): void {
+    const isCubic = curveType === 'cubic';
+    this.elements.$cssOutputContainer.style.display = isCubic ? 'block' : 'none';
+  }
+
+  private updateCssOutput(points: Point[]): void {
+    if (this.currentCurveType !== 'cubic' || points.length !== 4) return;
+
+    try {
+      const cssBezier = toCssCubicBezier(points);
+      if (cssBezier) {
+        this.elements.$cssOutput.textContent = cssBezier;
+        this.elements.$cssOutput.style.cursor = 'pointer';
+        this.elements.$cssOutput.style.color = 'var(--accent)';
+      } else {
+        this.elements.$cssOutput.textContent = 'Invalid CSS cubic-bezier';
+        this.elements.$cssOutput.style.cursor = 'default';
+        this.elements.$cssOutput.style.color = 'var(--text-light)';
+      }
+    } catch {
+      this.elements.$cssOutput.textContent = '';
+    }
   }
 }

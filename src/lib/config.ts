@@ -63,6 +63,10 @@ export const SELECTORS = {
   ONBOARD_BUTTON: '.onboard-button',
   DECREASE_BUTTON: 'button[data-action="decrease"]',
   INCREASE_BUTTON: 'button[data-action="increase"]',
+
+  CSS_OUTPUT_CONTAINER: '.css-output-container',
+  CSS_OUTPUT: '.css-output',
+  CSS_COPIED_INDICATOR: '.css-copied-indicator',
 } as const;
 
 export const CONFIG = {
