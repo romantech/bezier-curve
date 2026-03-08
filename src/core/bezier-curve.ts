@@ -126,7 +126,7 @@ export class BezierCurve extends Publisher {
        * 이후 애니메이션 재개 시, startTime을 '현재시간(now) - 경과시간(2000)'으로 보정하여
        * 다음 프레임의 경과 시간이 2000부터 시작되도록 만듦.
        */
-      if (!startTime) startTime = now - this.elapsedTime;
+      if (startTime === null) startTime = now - this.elapsedTime;
 
       this.elapsedTime = now - startTime;
       const t = this.progress;
@@ -185,6 +185,7 @@ export class BezierCurve extends Publisher {
     canvas.addEventListener('pointermove', this.onPointerMove.bind(this));
     canvas.addEventListener('pointerup', this.onPointerUp.bind(this));
     canvas.addEventListener('pointerleave', this.onPointerUp.bind(this));
+    canvas.addEventListener('pointercancel', this.onPointerUp.bind(this));
   }
 
   private onPointerDown(e: PointerEvent): void {
