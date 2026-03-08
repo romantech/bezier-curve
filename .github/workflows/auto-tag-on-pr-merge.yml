@@ -36,22 +36,14 @@ jobs:
 
           if [[ -n "${latest_line}" ]]; then
             latest_version="${latest_line%% *}"
-            latest_tag="${latest_line#* }"
           else
             latest_version="0.0.0"
-            latest_tag="v0.0.0"
           fi
 
           IFS='.' read -r major minor patch <<< "${latest_version}"
           next_patch=$((patch + 1))
 
-          if [[ "${latest_tag}" == v.* ]]; then
-            prefix="v."
-          else
-            prefix="v"
-          fi
-
-          next_tag="${prefix}${major}.${minor}.${next_patch}"
+          next_tag="v${major}.${minor}.${next_patch}"
           echo "tag=${next_tag}" >> "${GITHUB_OUTPUT}"
 
           if git rev-parse -q --verify "refs/tags/${next_tag}" >/dev/null; then
