@@ -1,0 +1,68 @@
+name: Auto Tag on PR Merge
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: auto-tag-main
+  cancel-in-progress: false
+
+jobs:
+  tag:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (with tags)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Create next patch tag
+        env:
+          MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
+        run: |
+          set -euo pipefail
+
+          git fetch --tags --force
+
+          latest_line="$(git tag -l | awk 'match($0,/^v\.?[0-9]+\.[0-9]+(\.[0-9]+)?$/){raw=$0;ver=$0;sub(/^v\.?/,"",ver);n=split(ver,a,".");if(n==2){ver=ver".0"};print ver" "raw}' | sort -V | tail -n1 || true)"
+
+          if [[ -n "${latest_line}" ]]; then
+            latest_version="${latest_line%% *}"
+            latest_tag="${latest_line#* }"
+          else
+            latest_version="0.0.0"
+            latest_tag="v0.0.0"
+          fi
+
+          IFS='.' read -r major minor patch <<< "${latest_version}"
+          next_patch=$((patch + 1))
+
+          if [[ "${latest_tag}" == v.* ]]; then
+            prefix="v."
+          else
+            prefix="v"
+          fi
+
+          next_tag="${prefix}${major}.${minor}.${next_patch}"
+
+          if git rev-parse -q --verify "refs/tags/${next_tag}" >/dev/null; then
+            echo "Tag ${next_tag} already exists. Skipping."
+            exit 0
+          fi
+
+          target_sha="${MERGE_SHA:-$(git rev-parse HEAD)}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git tag "${next_tag}" "${target_sha}"
+          git push origin "${next_tag}"
+
+          echo "Created ${next_tag} at ${target_sha}"
