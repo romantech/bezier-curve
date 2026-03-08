@@ -22,10 +22,45 @@ jobs:
           fetch-depth: 0
           ref: main
 
+      - name: Validate signing secrets
+        env:
+          TAG_SIGNING_GPG_PRIVATE_KEY: ${{ secrets.TAG_SIGNING_GPG_PRIVATE_KEY }}
+          TAG_SIGNING_NAME: ${{ secrets.TAG_SIGNING_NAME }}
+          TAG_SIGNING_EMAIL: ${{ secrets.TAG_SIGNING_EMAIL }}
+        run: |
+          set -euo pipefail
+
+          if [[ -z "${TAG_SIGNING_GPG_PRIVATE_KEY:-}" ]]; then
+            echo "Missing secret: TAG_SIGNING_GPG_PRIVATE_KEY"
+            exit 1
+          fi
+
+          if [[ -z "${TAG_SIGNING_NAME:-}" ]]; then
+            echo "Missing secret: TAG_SIGNING_NAME"
+            exit 1
+          fi
+
+          if [[ -z "${TAG_SIGNING_EMAIL:-}" ]]; then
+            echo "Missing secret: TAG_SIGNING_EMAIL"
+            exit 1
+          fi
+
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.TAG_SIGNING_GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.TAG_SIGNING_GPG_PASSPHRASE }}
+          git_user_signingkey: true
+          git_tag_gpgsign: true
+          git_committer_name: ${{ secrets.TAG_SIGNING_NAME }}
+          git_committer_email: ${{ secrets.TAG_SIGNING_EMAIL }}
+
       - name: Create next patch tag
         id: tagging
         env:
           MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
+          TAG_SIGNING_NAME: ${{ secrets.TAG_SIGNING_NAME }}
+          TAG_SIGNING_EMAIL: ${{ secrets.TAG_SIGNING_EMAIL }}
         run: |
           set -euo pipefail
 
@@ -66,10 +101,10 @@ jobs:
 
           target_sha="${MERGE_SHA:?merge_commit_sha is empty; refusing to tag moving main HEAD.}"
 
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "${TAG_SIGNING_NAME}"
+          git config user.email "${TAG_SIGNING_EMAIL}"
 
-          git tag -a "${next_tag}" "${target_sha}" -m "${next_tag}"
+          git tag -s "${next_tag}" "${target_sha}" -m "${next_tag}"
           git push origin "${next_tag}"
           echo "tag_created=true" >> "${GITHUB_OUTPUT}"
 
