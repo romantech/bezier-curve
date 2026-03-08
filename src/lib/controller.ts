@@ -24,6 +24,7 @@ export class Controller implements Observer {
   private readonly elements: Elements;
   private currentCurveType: BezierCurveType = INITIAL_CURVE;
   private copyStatusTimeoutId: number | null = null;
+  private copyStatusRafId: number | null = null;
 
   constructor({ bezierCurve, mapPoints, elements }: ControllerDependencies) {
     this.bezierCurve = bezierCurve;
@@ -248,6 +249,11 @@ export class Controller implements Observer {
   private showCopyStatus(message: string, isSuccess: boolean): void {
     const indicator = this.elements.$cssCopiedIndicator;
 
+    if (this.copyStatusRafId !== null) {
+      window.cancelAnimationFrame(this.copyStatusRafId);
+      this.copyStatusRafId = null;
+    }
+
     if (this.copyStatusTimeoutId !== null) {
       window.clearTimeout(this.copyStatusTimeoutId);
       this.copyStatusTimeoutId = null;
@@ -257,7 +263,8 @@ export class Controller implements Observer {
     indicator.textContent = '';
     indicator.style.color = isSuccess ? 'var(--accent)' : 'var(--text-light)';
 
-    window.requestAnimationFrame(() => {
+    this.copyStatusRafId = window.requestAnimationFrame(() => {
+      this.copyStatusRafId = null;
       indicator.textContent = message;
       indicator.style.opacity = '1';
       this.copyStatusTimeoutId = window.setTimeout(() => {
