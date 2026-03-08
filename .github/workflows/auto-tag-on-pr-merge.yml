@@ -31,7 +31,7 @@ jobs:
 
           git fetch --tags --force
 
-          if [[ -z "${MERGE_SHA}" ]]; then
+          if [[ -z "${MERGE_SHA:-}" ]]; then
             echo "merge_commit_sha is empty; refusing to tag moving main HEAD."
             exit 1
           fi
@@ -64,7 +64,7 @@ jobs:
             exit 0
           fi
 
-          target_sha="${MERGE_SHA}"
+          target_sha="${MERGE_SHA:?merge_commit_sha is empty; refusing to tag moving main HEAD.}"
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
