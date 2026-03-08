@@ -22,10 +22,56 @@ jobs:
           fetch-depth: 0
           ref: main
 
+      - name: Validate signing secrets
+        env:
+          TAG_SIGNING_GPG_PRIVATE_KEY: ${{ secrets.TAG_SIGNING_GPG_PRIVATE_KEY }}
+          TAG_SIGNING_GPG_PASSPHRASE: ${{ secrets.TAG_SIGNING_GPG_PASSPHRASE }}
+          TAG_SIGNING_PASSPHRASE_REQUIRED: ${{ vars.TAG_SIGNING_PASSPHRASE_REQUIRED }}
+          TAG_SIGNING_NAME: ${{ secrets.TAG_SIGNING_NAME }}
+          TAG_SIGNING_EMAIL: ${{ secrets.TAG_SIGNING_EMAIL }}
+        run: |
+          set -euo pipefail
+
+          if [[ -z "${TAG_SIGNING_GPG_PRIVATE_KEY:-}" ]]; then
+            echo "Missing secret: TAG_SIGNING_GPG_PRIVATE_KEY"
+            exit 1
+          fi
+
+          if [[ -z "${TAG_SIGNING_NAME:-}" ]]; then
+            echo "Missing secret: TAG_SIGNING_NAME"
+            exit 1
+          fi
+
+          if [[ -z "${TAG_SIGNING_EMAIL:-}" ]]; then
+            echo "Missing secret: TAG_SIGNING_EMAIL"
+            exit 1
+          fi
+
+          passphrase_required="${TAG_SIGNING_PASSPHRASE_REQUIRED:-false}"
+          passphrase_required="$(echo "${passphrase_required}" | tr '[:upper:]' '[:lower:]')"
+          if [[ "${passphrase_required}" == "1" || "${passphrase_required}" == "true" || "${passphrase_required}" == "yes" ]]; then
+            if [[ -z "${TAG_SIGNING_GPG_PASSPHRASE:-}" ]]; then
+              echo "Missing secret: TAG_SIGNING_GPG_PASSPHRASE (required because TAG_SIGNING_PASSPHRASE_REQUIRED is enabled)"
+              exit 1
+            fi
+          fi
+
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@e89d40939c28e39f97cf32126055eeae86ba74ec # v6.3.0
+        with:
+          gpg_private_key: ${{ secrets.TAG_SIGNING_GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.TAG_SIGNING_GPG_PASSPHRASE }}
+          git_user_signingkey: true
+          git_tag_gpgsign: true
+          git_committer_name: ${{ secrets.TAG_SIGNING_NAME }}
+          git_committer_email: ${{ secrets.TAG_SIGNING_EMAIL }}
+
       - name: Create next patch tag
         id: tagging
         env:
           MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
+          TAG_SIGNING_NAME: ${{ secrets.TAG_SIGNING_NAME }}
+          TAG_SIGNING_EMAIL: ${{ secrets.TAG_SIGNING_EMAIL }}
         run: |
           set -euo pipefail
 
@@ -66,10 +112,13 @@ jobs:
 
           target_sha="${MERGE_SHA:?merge_commit_sha is empty; refusing to tag moving main HEAD.}"
 
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "${TAG_SIGNING_NAME}"
+          git config user.email "${TAG_SIGNING_EMAIL}"
 
-          git tag -a "${next_tag}" "${target_sha}" -m "${next_tag}"
+          if ! git tag -s "${next_tag}" "${target_sha}" -m "${next_tag}"; then
+            echo "Failed to create a signed tag. If your key has a passphrase, set TAG_SIGNING_GPG_PASSPHRASE."
+            exit 1
+          fi
           git push origin "${next_tag}"
           echo "tag_created=true" >> "${GITHUB_OUTPUT}"
 
