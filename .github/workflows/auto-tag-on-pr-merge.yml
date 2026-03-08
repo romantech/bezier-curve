@@ -32,7 +32,7 @@ jobs:
 
           git fetch --tags --force
 
-          latest_line="$(git tag -l | awk 'match($0,/^v\.?[0-9]+\.[0-9]+(\.[0-9]+)?$/){raw=$0;ver=$0;sub(/^v\.?/,"",ver);n=split(ver,a,".");if(n==2){ver=ver".0"};print ver" "raw}' | sort -V | tail -n1 || true)"
+          latest_line="$(git tag -l | awk 'match($0,/^v[0-9]+\.[0-9]+(\.[0-9]+)?$/){raw=$0;ver=$0;sub(/^v/,"",ver);n=split(ver,a,".");if(n==2){ver=ver".0"};print ver" "raw}' | sort -V | tail -n1 || true)"
 
           if [[ -n "${latest_line}" ]]; then
             latest_version="${latest_line%% *}"
@@ -57,14 +57,14 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git tag "${next_tag}" "${target_sha}"
+          git tag -a "${next_tag}" "${target_sha}" -m "${next_tag}"
           git push origin "${next_tag}"
           echo "tag_created=true" >> "${GITHUB_OUTPUT}"
 
           echo "Created ${next_tag} at ${target_sha}"
 
       - name: Create GitHub Release (if missing)
-        if: steps.tagging.outputs.tag != ''
+        if: steps.tagging.outputs.tag_created == 'true'
         uses: actions/github-script@v7
         env:
           TAG_NAME: ${{ steps.tagging.outputs.tag }}
