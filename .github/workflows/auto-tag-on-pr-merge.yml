@@ -1,0 +1,104 @@
+name: Auto Tag on PR Merge
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+concurrency:
+  group: auto-tag-main
+  cancel-in-progress: false
+
+jobs:
+  tag:
+    permissions:
+      contents: write
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (with tags)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Create next patch tag
+        id: tagging
+        env:
+          MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
+        run: |
+          set -euo pipefail
+
+          git fetch --tags --force
+
+          if [[ -z "${MERGE_SHA:-}" ]]; then
+            echo "merge_commit_sha is empty; refusing to tag moving main HEAD."
+            exit 1
+          fi
+
+          latest_line="$(git tag -l | awk 'match($0,/^v\.?[0-9]+\.[0-9]+(\.[0-9]+)?$/){raw=$0;ver=$0;sub(/^v\.?/,"",ver);n=split(ver,a,/\./);if(n==2){ver=ver".0"};print ver" "raw}' | sort -V | tail -n1 || true)"
+
+          if [[ -n "${latest_line}" ]]; then
+            latest_version="${latest_line%% *}"
+            latest_tag="${latest_line#* }"
+          else
+            latest_version="0.0.0"
+            latest_tag="v0.0.0"
+          fi
+
+          IFS='.' read -r major minor patch <<< "${latest_version}"
+          next_patch=$((patch + 1))
+
+          if [[ "${latest_tag}" == v.* ]]; then
+            prefix="v."
+          else
+            prefix="v"
+          fi
+
+          next_tag="${prefix}${major}.${minor}.${next_patch}"
+          echo "tag=${next_tag}" >> "${GITHUB_OUTPUT}"
+
+          if git rev-parse -q --verify "refs/tags/${next_tag}" >/dev/null; then
+            echo "Tag ${next_tag} already exists. Skipping."
+            echo "tag_created=false" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          target_sha="${MERGE_SHA:?merge_commit_sha is empty; refusing to tag moving main HEAD.}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git tag -a "${next_tag}" "${target_sha}" -m "${next_tag}"
+          git push origin "${next_tag}"
+          echo "tag_created=true" >> "${GITHUB_OUTPUT}"
+
+          echo "Created ${next_tag} at ${target_sha}"
+
+      - name: Create GitHub Release (if missing)
+        if: steps.tagging.outputs.tag_created == 'true'
+        uses: actions/github-script@v7
+        env:
+          TAG_NAME: ${{ steps.tagging.outputs.tag }}
+        with:
+          script: |
+            const tag = process.env.TAG_NAME;
+            const { owner, repo } = context.repo;
+
+            try {
+              await github.rest.repos.getReleaseByTag({ owner, repo, tag });
+              core.info(`Release for ${tag} already exists. Skipping.`);
+            } catch (error) {
+              if (error.status !== 404) {
+                throw error;
+              }
+
+              await github.rest.repos.createRelease({
+                owner,
+                repo,
+                tag_name: tag,
+                name: tag,
+                generate_release_notes: true
+              });
+              core.info(`Created release for ${tag}.`);
+            }
