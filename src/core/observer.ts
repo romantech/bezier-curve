@@ -36,7 +36,9 @@ export class Publisher {
   }
 
   public notify(event: BezierEvent) {
-    this.observers.forEach((observer) => observer.update(event));
+    this.observers.forEach((observer) => {
+      observer.update(event);
+    });
     return this;
   }
 }
