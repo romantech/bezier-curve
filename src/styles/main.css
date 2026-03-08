@@ -183,6 +183,8 @@
 .css-copied-indicator {
   display: block;
   font-size: 12px;
+  line-height: 1.2;
+  min-height: calc(12px * 1.2);
   color: var(--accent);
   opacity: 0;
   transition: opacity 300ms;
