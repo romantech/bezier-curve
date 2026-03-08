@@ -68,6 +68,9 @@ jobs:
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git tag -a "${next_tag}" "${target_sha}" -m "${next_tag}"
+          git push origin "${next_tag}"
           echo "tag_created=true" >> "${GITHUB_OUTPUT}"
 
           echo "Created ${next_tag} at ${target_sha}"
