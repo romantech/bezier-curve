@@ -163,7 +163,7 @@ export class Controller implements Observer {
 
     const copyCssOutput = async () => {
       const text = $cssOutput.textContent;
-      if (!text || !text.startsWith('cubic-bezier')) return;
+      if (!text?.startsWith('cubic-bezier')) return;
 
       const copyStatus = await this.copyTextToClipboard(text);
       if (copyStatus === 'copied') {
