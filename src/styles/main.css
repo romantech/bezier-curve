@@ -158,6 +158,11 @@
 }
 
 .css-output {
+  appearance: none;
+  box-sizing: border-box;
+  width: 100%;
+  line-height: inherit;
+
   font-family: "Source Code Pro", Consolas, monospace;
   font-size: 14px;
   color: var(--accent);
